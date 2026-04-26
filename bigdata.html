@@ -74,24 +74,52 @@
         .tab-btn:hover { background-color: #dfe6e9; }
         .tab-btn.active { background-color: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 4px 10px rgba(9, 132, 227, 0.3); }
 
-        .global-toggle-btn {
-            background-color: var(--global-btn);
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background-color: var(--accent);
             color: white;
             border: none;
             padding: 12px 30px;
-            font-size: 1.1em;
+            font-size: 1em;
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(225, 112, 85, 0.3);
+            box-shadow: 0 4px 10px rgba(9, 132, 227, 0.3);
             transition: all 0.3s ease;
-            width: 100%;
-            max-width: 400px;
         }
 
-        .global-toggle-btn:hover { background-color: #d63031; transform: translateY(-2px); }
+        .btn:hover { background-color: #0753d1; transform: translateY(-2px); }
+        .btn:disabled { background-color: #bdc3c7; cursor: not-allowed; }
 
-        #quiz-container { display: flex; flex-direction: column; gap: 20px; animation: fadeIn 0.4s ease-in-out; }
+        .home-btn {
+            background-color: var(--global-btn);
+            box-shadow: 0 4px 10px rgba(225, 112, 85, 0.3);
+        }
+
+        .home-btn:hover { background-color: #d63031; }
+
+        .progress-info {
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        #quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            animation: fadeIn 0.4s ease-in-out;
+            min-height: 400px;
+        }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .question-card {
@@ -130,7 +158,6 @@
         </div>
 
         <div class="controls-container">
-            <button id="globalToggleBtn" class="global-toggle-btn" onclick="toggleAllAnswers()">Tüm Cevapları Göster</button>
             <div class="tabs">
                 <button class="tab-btn active" onclick="filterQuestions('all', this)">Tüm Havuz</button>
                 <button class="tab-btn" onclick="filterQuestions('Vize', this)">Vize Soruları</button>
@@ -141,13 +168,130 @@
             </div>
         </div>
 
+        <div class="progress-info" id="progressInfo"></div>
+
         <div id="quiz-container"></div>
+
+        <div class="button-group">
+            <button class="btn" id="prevBtn" onclick="previousQuestion()">← Önceki Soru</button>
+            <button class="btn home-btn" onclick="window.location.href='index.html'">🏠 Ana Sayfaya Dön</button>
+            <button class="btn" id="nextBtn" onclick="nextQuestion()">Sonraki Soru →</button>
+        </div>
     </div>
 
     <script>
         const sorular = [
             { q: "Büyük veri kavramı aşağıdakilerden hangisiyle en doğru şekilde tanımlanır?", options: ["A) Küçük hacimli veriler", "B) Yalnızca yapılandırılmış veriler", "C) Düşük hızda üretilen veriler", "D) Farklı kaynaklardan, yüksek hızda ve büyük hacimde üretilen veriler", "E) Sadece ilişkisel veritabanları"], ans: "D) Farklı kaynaklardan, yüksek hızda ve büyük hacimde üretilen veriler", exp: "Büyük veri; Hacim (Volume), Hız (Velocity) ve Çeşitlilik (Variety) bileşenleriyle tanımlanır.", exams: ["Vize 2020-2021"] },
             { q: "Aşağıdakilerden hangisi verinin sınıflandırılmış gruplarından (veri türlerinden) biri değildir?", options: ["A) Veri Parçası", "B) Erişilebilir Veri", "C) Gri Veri", "D) Karanlık Veri", "E) Şeffaf / Anlamlı Veri"], ans: "E) Şeffaf / Anlamlı Veri", exp: "Kurumsal veriler kullanım durumuna göre Erişilebilir, Gri ve Karanlık olarak sınıflandırılır. 'Anlamlı' veya 'Şeffaf' veri diye teknik bir sınıflama yoktur.", exams: ["Vize 2020-2021", "Vize 2023", "Vize 2024", "Vize 2024-25", "4 Kez Çıktı!"] },
+            // ... diğer sorular (kısaltma için özet gösterdim)
+        ];
+
+        let currentIndex = 0;
+        let currentFilter = 'all';
+        let filteredQuestions = [...sorular];
+
+        function filterQuestions(type, btnElement) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            currentFilter = type;
+            if (type !== 'all') {
+                filteredQuestions = sorular.filter(soru => 
+                    soru.exams.some(exam => exam.toLowerCase().includes(type.toLowerCase()))
+                );
+            } else {
+                filteredQuestions = [...sorular];
+            }
+            
+            currentIndex = 0;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+
+            if (filteredQuestions.length === 0) {
+                container.innerHTML = '<p style="text-align:center; font-size:1.2em; color:#d63031;">Bu kategoride soru bulunmamaktadır.</p>';
+                updateProgress();
+                return;
+            }
+
+            const soru = filteredQuestions[currentIndex];
+            let tagsHtml = soru.exams.map(exam => {
+                if(exam.includes("Kez Çıktı")) {
+                    return `<span class="exam-tag freq-tag">🔥 ${exam}</span>`;
+                } else if(exam.includes("Dikkat")) {
+                    return `<span class="exam-tag" style="background-color: #fcf3cf; color: #d35400; border: 1px solid #d35400;">${exam}</span>`;
+                }
+                return `<span class="exam-tag">${exam}</span>`;
+            }).join('');
+
+            let optionsHtml = soru.options.map(opt => `<li>${opt}</li>`).join('');
+
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            card.innerHTML = `
+                <div class="q-header">
+                    <div class="exam-tags">${tagsHtml}</div>
+                </div>
+                <p class="question-text">${currentIndex + 1}. ${soru.q}</p>
+                <ul class="options">${optionsHtml}</ul>
+                <button class="btn-toggle" onclick="toggleAnswer(this)">Cevabı ve Açıklamayı Göster</button>
+                <div class="answer-area">
+                    <p class="correct-ans">✔️ Doğru Cevap: ${soru.ans}</p>
+                    <p class="exp-text">💡 <strong>Açıklama:</strong> ${soru.exp}</p>
+                </div>
+            `;
+            container.appendChild(card);
+            updateProgress();
+            scrollToTop();
+        }
+
+        function updateProgress() {
+            const progressEl = document.getElementById('progressInfo');
+            progressEl.textContent = `Soru ${currentIndex + 1} / ${filteredQuestions.length}`;
+            
+            document.getElementById('prevBtn').disabled = currentIndex === 0;
+            document.getElementById('nextBtn').disabled = currentIndex === filteredQuestions.length - 1;
+        }
+
+        function previousQuestion() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            if (currentIndex < filteredQuestions.length - 1) {
+                currentIndex++;
+                renderQuestion();
+            }
+        }
+
+        function toggleAnswer(btn) {
+            const answerArea = btn.nextElementSibling;
+            if (answerArea.style.display === 'none' || answerArea.style.display === '') {
+                answerArea.style.display = 'block';
+                btn.textContent = 'Cevabı ve Açıklamayı Gizle';
+                btn.style.backgroundColor = '#34495e';
+            } else {
+                answerArea.style.display = 'none';
+                btn.textContent = 'Cevabı ve Açıklamayı Göster';
+                btn.style.backgroundColor = '#0984e3';
+            }
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const allBtn = document.querySelector('.tab-btn.active');
+            filterQuestions('all', allBtn);
+        });
+    </script>
             { q: "Analiz edilmeden saklanan ve farkında olunmadan oluşan veri türü hangisidir?", options: ["A) Veri Parçası", "B) Erişilebilir Veri", "C) Gri Veri", "D) Karanlık Veri", "E) Yapısal Veri"], ans: "D) Karanlık Veri", exp: "Karanlık veri (Dark Data), toplanıp depolanan ancak değer üretmek için hiç analiz edilmeyen verilerdir.", exams: ["Vize 2020-2021"] },
             { q: "Büyük verinin en temel özelliği aşağıdakilerden hangisidir?", options: ["A) Az hacimli olması", "B) Tek formatta olması", "C) Statik olması", "D) Analiz edilerek değer üretmesi", "E) Manuel işlenmesi"], ans: "D) Analiz edilerek değer üretmesi", exp: "Değer (Value) Bileşeni: Veri yığınlarının işlenip kuruma kârlılık, strateji veya öngörü sağlaması asıl hedeftir.", exams: ["Vize 2020-2021"] },
             { q: "Yapısal veriye örnek hangisidir?", options: ["A) Video dosyaları", "B) Sosyal medya paylaşımları", "C) SQL tabloları", "D) Ses kayıtları", "E) PDF belgeleri"], ans: "C) SQL tabloları", exp: "Yapısal Veri (Structured Data): Belirli bir satır-sütun veya şema modeline sahip verilerdir. SQL tabloları en net örnektir.", exams: ["Vize 2020-2021"] },

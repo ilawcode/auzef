@@ -81,6 +81,45 @@
             box-shadow: 0 4px 10px rgba(9,132,227,0.3);
         }
 
+        .btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1em;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(9, 132, 227, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover { background-color: #0753d1; transform: translateY(-2px); }
+        .btn:disabled { background-color: #bdc3c7; cursor: not-allowed; }
+
+        .home-btn {
+            background-color: var(--global-btn);
+            box-shadow: 0 4px 10px rgba(225, 112, 85, 0.3);
+        }
+
+        .home-btn:hover { background-color: #d63031; }
+
+        .progress-info {
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
         .global-toggle-btn {
             background-color: var(--global-btn);
             color: white;
@@ -207,7 +246,6 @@
         </div>
 
         <div class="controls-container">
-            <button id="globalToggleBtn" class="global-toggle-btn" onclick="toggleAllAnswers()">Tüm Cevapları Göster</button>
             <div class="tabs">
                 <button class="tab-btn active" onclick="filterQuestions('all', this)">Tüm Havuz</button>
                 <button class="tab-btn" onclick="filterQuestions('Vize', this)">Vize Soruları</button>
@@ -217,7 +255,15 @@
             </div>
         </div>
 
+        <div class="progress-info" id="progressInfo"></div>
+
         <div id="quiz-container"></div>
+
+        <div class="button-group">
+            <button class="btn" id="prevBtn" onclick="previousQuestion()">← Önceki Soru</button>
+            <button class="btn home-btn" onclick="window.location.href='index.html'">🏠 Ana Sayfaya Dön</button>
+            <button class="btn" id="nextBtn" onclick="nextQuestion()">Sonraki Soru →</button>
+        </div>
     </div>
 
     <script>
@@ -1127,94 +1173,116 @@
             }
         ];
 
-        let allAnswersVisible = false;
+        let currentIndex = 0;
+        let currentFilter = 'all';
+        let filteredQuestions = [...sorular];
 
-        function renderQuestions(filter) {
+        function filterQuestions(type, btnElement) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+            
+            currentFilter = type;
+            if (type === 'all') {
+                filteredQuestions = [...sorular];
+            } else if (type === 'banko') {
+                filteredQuestions = sorular.filter(s => s.exams.filter(e => !e.includes('Kez')).length >= 2);
+            } else {
+                filteredQuestions = sorular.filter(s => s.exams.some(e => e.includes(type)));
+            }
+            
+            currentIndex = 0;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
             const container = document.getElementById('quiz-container');
             container.innerHTML = '';
-
-            const filtered = filter === 'all'
-                ? sorular
-                : filter === 'banko'
-                ? sorular.filter(s => s.exams.filter(e => !e.includes('Kez')).length >= 2)
-                : sorular.filter(s => s.exams.some(e => e.includes(filter)));
-
-            if (filtered.length === 0) {
-                container.innerHTML = '<p style="text-align:center;color:#636e72;font-size:1.1em;">Bu kategoride soru bulunamadı.</p>';
+            
+            if (filteredQuestions.length === 0) {
+                container.innerHTML = '<p style="text-align:center;color:#636e72;font-size:1.2em;padding:30px;">Bu kategoride soru bulunamadı.</p>';
+                document.getElementById('prevBtn').disabled = true;
+                document.getElementById('nextBtn').disabled = true;
+                updateProgress();
                 return;
             }
 
-            filtered.forEach((soru, idx) => {
-                const card = document.createElement('div');
-                card.className = 'question-card';
+            const soru = filteredQuestions[currentIndex];
+            const tagsHTML = soru.exams.map(e => {
+                const isFreq = e.includes('Kez Çıktı');
+                let cls = 'exam-tag';
+                if (isFreq) cls += ' freq-tag';
+                else if (e.includes('Vize')) cls += ' vize-tag';
+                else if (e.includes('Final')) cls += ' final-tag';
+                else if (e.includes('Büt')) cls += ' but-tag';
+                return `<span class="${cls}">${e}</span>`;
+            }).join('');
 
-                const tagsHTML = soru.exams.map(e => {
-                    const isFreq = e.includes('Kez Çıktı');
-                    let cls = 'exam-tag';
-                    if (isFreq)             cls += ' freq-tag';
-                    else if (e.includes('Vize'))  cls += ' vize-tag';
-                    else if (e.includes('Final')) cls += ' final-tag';
-                    else if (e.includes('Büt'))   cls += ' but-tag';
-                    return `<span class="${cls}">${e}</span>`;
-                }).join('');
-
-                const optionsHTML = soru.options.map(o => `<li>${o}</li>`).join('');
-                const answerId = `answer-${idx}-${filter}`;
-
-                card.innerHTML = `
-                    <div class="q-header">
-                        <strong style="color:var(--secondary);font-size:0.95em;">Soru ${idx + 1}</strong>
-                        <div class="exam-tags">${tagsHTML}</div>
-                    </div>
-                    <p class="question-text">${soru.q}</p>
-                    <ul class="options">${optionsHTML}</ul>
-                    <button class="btn-toggle" onclick="toggleAnswer('${answerId}', this)">Cevabı Göster</button>
-                    <div class="answer-area" id="${answerId}" style="${allAnswersVisible ? 'display:block' : ''}">
-                        <p class="correct-ans">✔ Doğru Cevap: ${soru.ans}</p>
-                        <p class="exp-text">${soru.exp}</p>
-                    </div>
-                `;
-
-                if (allAnswersVisible) {
-                    card.querySelector('.btn-toggle').textContent = 'Cevabı Gizle';
-                }
-
-                container.appendChild(card);
-            });
+            const optionsHTML = soru.options.map(o => `<li>${o}</li>`).join('');
+            
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            card.innerHTML = `
+                <div class="q-header">
+                    <strong style="color:var(--secondary);font-size:0.95em;">Soru ${currentIndex + 1}</strong>
+                    <div class="exam-tags">${tagsHTML}</div>
+                </div>
+                <p class="question-text">${soru.q}</p>
+                <ul class="options">${optionsHTML}</ul>
+                <button class="btn-toggle" onclick="toggleAnswer(this)">Cevabı Göster</button>
+                <div class="answer-area" style="display:none;">
+                    <p class="correct-ans">✔ Doğru Cevap: ${soru.ans}</p>
+                    <p class="exp-text">${soru.exp}</p>
+                </div>
+            `;
+            
+            container.appendChild(card);
+            
+            document.getElementById('prevBtn').disabled = currentIndex === 0;
+            document.getElementById('nextBtn').disabled = currentIndex === filteredQuestions.length - 1;
+            
+            updateProgress();
+            scrollToTop();
         }
 
-        function toggleAnswer(id, btn) {
-            const area = document.getElementById(id);
-            if (area.style.display === 'none' || area.style.display === '') {
-                area.style.display = 'block';
+        function previousQuestion() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            if (currentIndex < filteredQuestions.length - 1) {
+                currentIndex++;
+                renderQuestion();
+            }
+        }
+
+        function toggleAnswer(btn) {
+            const answerArea = btn.nextElementSibling;
+            if (answerArea.style.display === 'none' || answerArea.style.display === '') {
+                answerArea.style.display = 'block';
                 btn.textContent = 'Cevabı Gizle';
             } else {
-                area.style.display = 'none';
+                answerArea.style.display = 'none';
                 btn.textContent = 'Cevabı Göster';
             }
         }
 
-        function toggleAllAnswers() {
-            allAnswersVisible = !allAnswersVisible;
-            document.getElementById('globalToggleBtn').textContent =
-                allAnswersVisible ? 'Tüm Cevapları Gizle' : 'Tüm Cevapları Göster';
-            document.querySelectorAll('.answer-area').forEach(area => {
-                area.style.display = allAnswersVisible ? 'block' : 'none';
-            });
-            document.querySelectorAll('.btn-toggle').forEach(btn => {
-                btn.textContent = allAnswersVisible ? 'Cevabı Gizle' : 'Cevabı Göster';
-            });
+        function updateProgress() {
+            if (filteredQuestions.length > 0) {
+                document.getElementById('progressInfo').textContent = 
+                    `Soru ${currentIndex + 1} / ${filteredQuestions.length}`;
+            } else {
+                document.getElementById('progressInfo').textContent = '';
+            }
         }
 
-        function filterQuestions(filter, clickedBtn) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            clickedBtn.classList.add('active');
-            allAnswersVisible = false;
-            document.getElementById('globalToggleBtn').textContent = 'Tüm Cevapları Göster';
-            renderQuestions(filter);
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        renderQuestions('all');
+        filterQuestions('all', document.querySelector('.tab-btn.active'));
     </script>
 </body>
 </html>

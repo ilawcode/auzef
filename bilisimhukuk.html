@@ -75,24 +75,52 @@
         .tab-btn:hover { background-color: #dfe6e9; }
         .tab-btn.active { background-color: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 4px 10px rgba(9, 132, 227, 0.3); }
 
-        .global-toggle-btn {
-            background-color: var(--global-btn);
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background-color: var(--accent);
             color: white;
             border: none;
             padding: 12px 30px;
-            font-size: 1.1em;
+            font-size: 1em;
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(225, 112, 85, 0.3);
+            box-shadow: 0 4px 10px rgba(9, 132, 227, 0.3);
             transition: all 0.3s ease;
-            width: 100%;
-            max-width: 400px;
         }
 
-        .global-toggle-btn:hover { background-color: #d63031; transform: translateY(-2px); }
+        .btn:hover { background-color: #0753d1; transform: translateY(-2px); }
+        .btn:disabled { background-color: #bdc3c7; cursor: not-allowed; }
 
-        #quiz-container { display: flex; flex-direction: column; gap: 20px; animation: fadeIn 0.4s ease-in-out; }
+        .home-btn {
+            background-color: var(--global-btn);
+            box-shadow: 0 4px 10px rgba(225, 112, 85, 0.3);
+        }
+
+        .home-btn:hover { background-color: #d63031; }
+
+        .progress-info {
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        #quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            animation: fadeIn 0.4s ease-in-out;
+            min-height: 400px;
+        }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .question-card {
@@ -131,7 +159,6 @@
         </div>
 
         <div class="controls-container">
-            <button id="globalToggleBtn" class="global-toggle-btn" onclick="toggleAllAnswers()">Tüm Cevapları Göster</button>
             <div class="tabs">
                 <button class="tab-btn active" onclick="filterQuestions('all', this)">Tüm Havuz</button>
                 <button class="tab-btn" onclick="filterQuestions('Vize', this)">Vize Soruları</button>
@@ -142,16 +169,24 @@
             </div>
         </div>
 
+        <div class="progress-info" id="progressInfo"></div>
+
         <div id="quiz-container"></div>
+
+        <div class="button-group">
+            <button class="btn" id="prevBtn" onclick="previousQuestion()">← Önceki Soru</button>
+            <button class="btn home-btn" onclick="window.location.href='index.html'">🏠 Ana Sayfaya Dön</button>
+            <button class="btn" id="nextBtn" onclick="nextQuestion()">Sonraki Soru →</button>
+        </div>
     </div>
 
     <script>
         const sorular = [
             { 
-                q: "5651 Sayılı Kanunda (kısaca İnternet Kanununda) yer alan, 'İnternet ortamı üzerinden kullanıcılara sunulan her türlü bilgi veya veriyi üreten, değiştiren ve sağlayan gerçek veya tüzel kişi' şeklindeki cümle aşağıdakilerden hangisini tanımlamaktadır?", 
-                options: ["A) Yer sağlayıcı", "B) Erişim sağlayıcı", "C) İçerik sağlayıcı", "D) Aracı hizmet sağlayıcı", "E) Toplu kullanım sağlayıcı"], 
-                ans: "C) İçerik sağlayıcı", 
-                exp: "Kanunun 2. maddesinde yer alan yasal tanımdır. İnternette okuduğunuz bir metni yazan, izlediğiniz bir videoyu çeken veya bir fotoğrafı yükleyen kişi 'İçerik Sağlayıcı'dır.", 
+                q: "'Lidersiz Organizasyonların Önlenemeyen Başarısı' kitabında ağ tipi toplumsal örgütlenme hangi hayvana benzetilmiştir?", 
+                options: ["A) Örümcek", "B) Akrep", "C) Deniz yıldızı", "D) Kırkayak", "E) Kurbağa"],
+                ans: "C) Deniz yıldızı", 
+                exp: "Kitapta ağ tipi örgütlenme deniz yıldızına benzetilmiştir.",
                 exams: ["Vize", "Bütünleme", "5 Kez Çıktı!"] 
             },
             { 
@@ -660,94 +695,111 @@
             }
         ];
 
+        let currentIndex = 0;
+        let currentFilter = 'all';
+        let filteredQuestions = [...sorular];
         let allAnswersVisible = false;
 
         function filterQuestions(type, btnElement) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             btnElement.classList.add('active');
 
+            currentFilter = type;
+            if (type !== 'all') {
+                filteredQuestions = sorular.filter(soru => 
+                    soru.exams.some(exam => exam.toLowerCase().includes(type.toLowerCase()))
+                );
+            } else {
+                filteredQuestions = [...sorular];
+            }
+            
+            currentIndex = 0;
+            allAnswersVisible = false;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
             const container = document.getElementById('quiz-container');
             container.innerHTML = '';
 
-            let filtered = sorular;
-            if (type !== 'all') {
-                filtered = sorular.filter(soru => 
-                    soru.exams.some(exam => exam.toLowerCase().includes(type.toLowerCase()))
-                );
+            if (filteredQuestions.length === 0) {
+                container.innerHTML = '<p style="text-align:center; font-size:1.2em; color:#d63031;">Bu kategoride soru bulunmamaktadır.</p>';
+                updateProgress();
+                return;
             }
 
-            filtered.forEach((soru, index) => {
-                let tagsHtml = soru.exams.map(exam => {
-                    if(exam.includes("Kez Çıktı")) {
-                        return `<span class="exam-tag freq-tag">🔥 ${exam}</span>`;
-                    } else if(exam.includes("Dikkat")) {
-                        return `<span class="exam-tag" style="background-color: #fcf3cf; color: #d35400; border: 1px solid #d35400;">${exam}</span>`;
-                    }
-                    return `<span class="exam-tag">${exam}</span>`;
-                }).join('');
+            const soru = filteredQuestions[currentIndex];
+            let tagsHtml = soru.exams.map(exam => {
+                if(exam.includes("Kez Çıktı")) {
+                    return `<span class="exam-tag freq-tag">🔥 ${exam}</span>`;
+                } else if(exam.includes("Dikkat")) {
+                    return `<span class="exam-tag" style="background-color: #fcf3cf; color: #d35400; border: 1px solid #d35400;">${exam}</span>`;
+                }
+                return `<span class="exam-tag">${exam}</span>`;
+            }).join('');
 
-                let optionsHtml = soru.options.map(opt => `<li>${opt}</li>`).join('');
-                
-                let displayState = allAnswersVisible ? 'block' : 'none';
-                let btnText = allAnswersVisible ? 'Cevabı ve Açıklamayı Gizle' : 'Cevabı ve Açıklamayı Göster';
-                let btnColor = allAnswersVisible ? '#34495e' : '#0984e3';
+            let optionsHtml = soru.options.map(opt => `<li>${opt}</li>`).join('');
+            let displayState = allAnswersVisible ? 'block' : 'none';
+            let btnText = allAnswersVisible ? 'Cevabı ve Açıklamayı Gizle' : 'Cevabı ve Açıklamayı Göster';
 
-                const card = document.createElement('div');
-                card.className = 'question-card';
-                card.innerHTML = `
-                    <div class="q-header">
-                        <div class="exam-tags">${tagsHtml}</div>
-                    </div>
-                    <p class="question-text">${index + 1}. ${soru.q}</p>
-                    <ul class="options">${optionsHtml}</ul>
-                    <button class="btn-toggle" style="background-color: ${btnColor}" onclick="toggleSingleAnswer(this)">${btnText}</button>
-                    <div class="answer-area" style="display: ${displayState}">
-                        <p class="correct-ans">✔️ Doğru Cevap: ${soru.ans}</p>
-                        <p class="exp-text">💡 <strong>Açıklama:</strong> ${soru.exp}</p>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            card.innerHTML = `
+                <div class="q-header">
+                    <div class="exam-tags">${tagsHtml}</div>
+                </div>
+                <p class="question-text">${currentIndex + 1}. ${soru.q}</p>
+                <ul class="options">${optionsHtml}</ul>
+                <button class="btn-toggle" onclick="toggleAnswer(this)">${btnText}</button>
+                <div class="answer-area" style="display: ${displayState}">
+                    <p class="correct-ans">✔️ Doğru Cevap: ${soru.ans}</p>
+                    <p class="exp-text">💡 <strong>Açıklama:</strong> ${soru.exp}</p>
+                </div>
+            `;
+            container.appendChild(card);
+            updateProgress();
+            scrollToTop();
         }
 
-        function toggleSingleAnswer(btn) {
-            const targetDiv = btn.nextElementSibling;
-            if (targetDiv.style.display === 'none' || targetDiv.style.display === '') {
-                targetDiv.style.display = 'block';
+        function updateProgress() {
+            const progressEl = document.getElementById('progressInfo');
+            progressEl.textContent = `Soru ${currentIndex + 1} / ${filteredQuestions.length}`;
+            
+            document.getElementById('prevBtn').disabled = currentIndex === 0;
+            document.getElementById('nextBtn').disabled = currentIndex === filteredQuestions.length - 1;
+        }
+
+        function previousQuestion() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            if (currentIndex < filteredQuestions.length - 1) {
+                currentIndex++;
+                renderQuestion();
+            }
+        }
+
+        function toggleAnswer(btn) {
+            const answerArea = btn.nextElementSibling;
+            if (answerArea.style.display === 'none' || answerArea.style.display === '') {
+                answerArea.style.display = 'block';
+                allAnswersVisible = true;
                 btn.textContent = 'Cevabı ve Açıklamayı Gizle';
                 btn.style.backgroundColor = '#34495e';
             } else {
-                targetDiv.style.display = 'none';
+                answerArea.style.display = 'none';
+                allAnswersVisible = false;
                 btn.textContent = 'Cevabı ve Açıklamayı Göster';
                 btn.style.backgroundColor = '#0984e3';
             }
         }
 
-        function toggleAllAnswers() {
-            allAnswersVisible = !allAnswersVisible;
-            const globalBtn = document.getElementById('globalToggleBtn');
-            const allAnswerAreas = document.querySelectorAll('.answer-area');
-            const allToggleBtns = document.querySelectorAll('.btn-toggle');
-
-            if (allAnswersVisible) {
-                globalBtn.textContent = 'Tüm Cevapları ve Açıklamaları Gizle';
-                globalBtn.style.backgroundColor = '#34495e';
-                
-                allAnswerAreas.forEach(area => area.style.display = 'block');
-                allToggleBtns.forEach(btn => {
-                    btn.textContent = 'Cevabı ve Açıklamayı Gizle';
-                    btn.style.backgroundColor = '#34495e';
-                });
-            } else {
-                globalBtn.textContent = 'Tüm Cevapları ve Açıklamaları Göster';
-                globalBtn.style.backgroundColor = 'var(--global-btn)';
-                
-                allAnswerAreas.forEach(area => area.style.display = 'none');
-                allToggleBtns.forEach(btn => {
-                    btn.textContent = 'Cevabı ve Açıklamayı Göster';
-                    btn.style.backgroundColor = '#0984e3';
-                });
-            }
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         window.addEventListener('DOMContentLoaded', () => {
