@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AUZEF İletişim Sosyolojisi - Tam Kapsamlı Soru Bankası</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #0984e3;
+            --success: #00b894;
+            --bg: #f4f6f8;
+            --card-bg: #ffffff;
+            --text: #2d3436;
+            --border: #dfe6e9;
+            --global-btn: #e17055;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container { max-width: 1000px; margin: 0 auto; }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 30px 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .header h1 { margin: 0 0 10px 0; font-size: 2.2em; }
+        .header p  { margin: 0; font-size: 1.1em; color: #bdc3c7; }
+
+        .controls-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+            background: var(--bg);
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background-color: #ecf0f1;
+            color: var(--primary);
+            border: 2px solid var(--border);
+            padding: 10px 20px;
+            font-size: 1.05em;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .tab-btn:hover { background-color: #dfe6e9; }
+        .tab-btn.active {
+            background-color: var(--accent);
+            color: white;
+            border-color: var(--accent);
+            box-shadow: 0 4px 10px rgba(9,132,227,0.3);
+        }
+
+        .global-toggle-btn {
+            background-color: var(--global-btn);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(225,112,85,0.3);
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 400px;
+        }
+        .global-toggle-btn:hover {
+            background-color: #d63031;
+            transform: translateY(-2px);
+        }
+
+        #quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 25px;
+            border-left: 6px solid var(--accent);
+        }
+
+        .q-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .exam-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .exam-tag {
+            background-color: #ffeaa7;
+            color: #d63031;
+            padding: 4px 10px;
+            border-radius: 5px;
+            font-size: 0.82em;
+            font-weight: bold;
+        }
+        .exam-tag.vize-tag  { background-color: #dfe6e9; color: #2d3436; }
+        .exam-tag.final-tag { background-color: #d6eaf8; color: #154360; }
+        .exam-tag.but-tag   { background-color: #d5f5e3; color: #1e8449; }
+        .exam-tag.freq-tag  { background-color: #e17055; color: white;   }
+
+        .question-text {
+            font-size: 1.15em;
+            font-weight: 600;
+            color: var(--primary);
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .options {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .options li {
+            background-color: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 1em;
+        }
+
+        .btn-toggle {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            font-size: 1.05em;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-toggle:hover { background-color: var(--primary); }
+
+        .answer-area {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #eafaf1;
+            border-left: 5px solid var(--success);
+            border-radius: 0 8px 8px 0;
+        }
+        .correct-ans {
+            font-size: 1.1em;
+            color: var(--success);
+            margin: 0 0 8px 0;
+            font-weight: bold;
+        }
+        .exp-text { margin: 0; color: var(--text); line-height: 1.5; font-size: 0.95em; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>İletişim Sosyolojisi</h1>
+            <p>Eksiksiz Çıkmış Soru Havuzu (Vize, Final, Büt ve En Çok Tekrar Edenler)</p>
+        </div>
+
+        <div class="controls-container">
+            <button id="globalToggleBtn" class="global-toggle-btn" onclick="toggleAllAnswers()">Tüm Cevapları Göster</button>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="filterQuestions('all', this)">Tüm Havuz</button>
+                <button class="tab-btn" onclick="filterQuestions('Vize', this)">Vize Soruları</button>
+                <button class="tab-btn" onclick="filterQuestions('Final', this)">Final Soruları</button>
+                <button class="tab-btn" onclick="filterQuestions('Büt', this)">Bütünleme Soruları</button>
+                <button class="tab-btn" style="background-color:#ffeaa7;color:#d63031;" onclick="filterQuestions('banko', this)">🔥 Banko Sorular (Tekrarlar)</button>
+            </div>
+        </div>
+
+        <div id="quiz-container"></div>
+    </div>
+
+    <script>
+        const sorular = [
+            {
+                q: "'Lidersiz Organizasyonların Önlenemeyen Başarısı' kitabında ağ tipi toplumsal örgütlenme hangi hayvana benzetilmiştir?",
+                options: ["A) Örümcek", "B) Akrep", "C) Deniz yıldızı", "D) Kırkayak", "E) Kurbağa"],
+                ans: "C) Deniz yıldızı",
+                exp: "⚠️ Sınav anahtarı uyarısı: | 24-25 Büt: C) Deniz yıldızı | 23-24 Final: E) Deniz yıldızı | 2022 Final: E) Deniz Yıldızı",
+                exams: ["24-25 Büt", "23-24 Final", "2022 Final", "3 Kez Çıktı!"]
+            },
+            {
+                q: "İletişimin sosyal hayattaki rolünü araştıran ilk modern araştırma ve çalışmalar aşağıdaki okulların hangisinin çatısı altında yapılmıştır?",
+                options: ["A) Cambridge Okulu", "B) Frankfurt Okulu", "C) Roma Okulu", "D) Ankara Okulu", "E) Şikago Okulu"],
+                ans: "E) Şikago Okulu",
+                exp: "İletişimin sosyal hayattaki rolüne ilişkin ilk modern araştırmalar, 20. yüzyılın başında Chicago Üniversitesi çatısı altında yapılmıştır; Şikago Okulu iletişimi toplumsal bütünleşmenin temel aracı olarak incelemiştir.",
+                exams: ["24-25 Final", "23-24 Büt", "2022 Final", "3 Kez Çıktı!"]
+            },
+            {
+                q: "Medyanın, okurun güvenini kazanmak amacıyla ortaya koyduğu, mesleğin onurunun korunması çabalarından doğan mesleki ve etik ilkelere genel olarak verilen ad aşağıdakilerden hangisidir?",
+                options: ["A) Medya etiği", "B) Basın ahlakı", "C) Ahlak esasları", "D) Etik kodlar", "E) Öz denetim"],
+                ans: "B) Basın ahlakı",
+                exp: "⚠️ Sınav anahtarı uyarısı: | 24-25 Final: B) Basın ahlakı | 23-24 Büt: E) Etik kodlar | 2022 Final: A) Etik Kodlar",
+                exams: ["24-25 Final", "23-24 Büt", "2022 Final", "3 Kez Çıktı!"]
+            },
+            {
+                q: "Hedefin kaynak tarafından gönderilen iletileri alma, yorumlama ve çözümleme sürecini aşağıdaki kavramlardan hangisi açıklar?",
+                options: ["A) Kodlama", "B) Kod açma", "C) Mesaj", "D) Geri bildirim", "E) Feedback"],
+                ans: "B) Kod açma",
+                exp: "⚠️ Sınav anahtarı uyarısı: | 23-24 Büt: B) Kod açma | 2022 Final: E) Geri Bildirim",
+                exams: ["23-24 Büt", "2022 Final", "2 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi okur temsilcisinin görevleri arasında sayılamaz?",
+                options: ["A) Gazete haberlerinde kalite kontrol görevini yerine getirmek", "B) Gazete reklam ve tirajlarını artırmak", "C) Editoryal yönetimi etik sınırlar içinde tutmak", "D) Haberlerin basın ahlak kurallarına uygun olmasını denetlemek", "E) Okurların ciddiye alındıklarını göstermek ve okuru gazeteye bağlamak"],
+                ans: "B) Gazete reklam ve tirajlarını artırmak",
+                exp: "Okur temsilcisi (ombudsman), gazetede kalite, etik ve okur haklarını denetler; reklam ve tiraj artırma ticari bir işlev olup okur temsilcisinin görevi değildir.",
+                exams: ["23-24 Büt", "2022 Final", "2 Kez Çıktı!"]
+            },
+            {
+                q: "1941'de yayımlanan 'Yönetimsel ve Eleştirel İletişim Araştırması Üzerine Düşünceler' makalesi ile iletişim alanında liberal ve eleştirel ayrımın temellerini atan isim aşağıdakilerden hangisidir?",
+                options: ["A) Theodor Adorno", "B) Carl Hovland", "C) Charles Cooley", "D) Paul Felix Lazarsfeld", "E) Max Horkheimer"],
+                ans: "D) Paul Felix Lazarsfeld",
+                exp: "Paul Felix Lazarsfeld, 1941'de yayımladığı makaleyle iletişim araştırmalarını 'yönetimsel' (liberal/ana akım) ve 'eleştirel' olmak üzere ikiye ayırmış, bu ayrımın temellerini atmıştır.",
+                exams: ["23-24 Büt", "2022 Final", "2 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdaki önermelerden hangisi Frankfurt Okulu düşünürlerinin temel görüşleri arasında yer almaz?",
+                options: ["A) Kültür endüstrileri istihdama katkı sağlayan önemli bir ekonomik aktördür.", "B) İdeoloji, eşit olmayan güç ve iktidar mücadelesini gizlemek için gerçekleri çarpıtır.", "C) Medya, ideolojinin rıza üretme aracıdır.", "D) Kapitalist toplumlarda gerçekler burjuvazi tarafından üretilir.", "E) Kitle toplumu, kültür endüstrileri tarafından kolayca aptallaştırılabilir."],
+                ans: "A) Kültür endüstrileri istihdama katkı sağlayan önemli bir ekonomik aktördür.",
+                exp: "Frankfurt Okulu düşünürlerine göre kültür endüstrileri bireyleri aptallaştırır ve sisteme entegre eder; kültür endüstrilerinin istihdama katkı sağladığı görüşü ise liberal bir yaklaşıma aittir, eleştirel kurama değil.",
+                exams: ["23-24 Büt", "2022 Final", "2 Kez Çıktı!"]
+            },
+            {
+                q: "'Dijital uçurum' kavramını en iyi tanımlayan cümle aşağıdakilerden hangisidir?",
+                options: ["A) Sosyal medyada iletişim içindeki bireylerin bazılarının profillerinin çok profesyonel iken bazılarının çok basit kalmasıdır.", "B) Çevrim içi alışveriş siteleri arasındaki çok yüksek fiyat ve kalite farklarıdır.", "C) Bireylerin bilgi ve internet teknolojilerine ulaşma imkânları açısından ülke içi veya merkez ile çevre ülkeler arasındaki büyük farklılıktır.", "D) Bir bireyin bilgisayar ya da akıllı telefon kullanımında son modeller yerine ilk veya ilkel modellerde ısrar etmesidir.", "E) Çevrim içi oyun oynayan iki kişi arasındaki tecrübe farkının çok büyük olmasıdır."],
+                ans: "C) Bireylerin bilgi ve internet teknolojilerine ulaşma imkânları açısından ülke içi veya merkez ile çevre ülkeler arasındaki büyük farklılıktır.",
+                exp: "Dijital uçurum, bilgi ve internet teknolojilerine erişim olanakları bakımından bireyler, toplumsal kesimler veya ülkeler arasındaki eşitsizliği ifade eder.",
+                exams: ["23-24 Büt", "2022 Final", "2 Kez Çıktı!"]
+            },
+            {
+                q: "'Politik İktisadın İlkeleri' eseriyle basın üzerindeki vergilerin özgür basının önünde engel olduğunu savunan düşünür aşağıdakilerden hangisidir?",
+                options: ["A) Jean Jacques Rousseau", "B) Karl Marx", "C) John Stuart Mill", "D) Saint Simon", "E) Michel Chevalier"],
+                ans: "C) John Stuart Mill",
+                exp: "John Stuart Mill, 'Politik İktisadın İlkeleri' adlı eserinde basın üzerindeki vergilerin (stamp duty) özgür basının önünde ciddi bir engel olduğunu savunmuş ve bu vergilerin kaldırılması için mücadele etmiştir.",
+                exams: ["23-24 Büt", "2022 Final", "2 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi medyanın kamu yararına gördüğü işlevler arasında sayılamaz?",
+                options: ["A) Siyasal haberlerle halkı bilgilendirmek", "B) Kamusal tartışmalar başlatarak kamuoyu oluşturmak", "C) Yolsuzluk ve anti-demokratik uygulamalardan halkı haberdar etmek", "D) Halk adına yöneticileri denetlemek, sorular yöneltmek", "E) Medya sahiplerine siyasi ve ekonomik destek sağlamak"],
+                ans: "E) Medya sahiplerine siyasi ve ekonomik destek sağlamak",
+                exp: "⚠️ Sınav anahtarı uyarısı: | 23-24 Final: E) Medya sahiplerine siyasi ve ekonomik destek sağlamak | 2022 Final: E) Medyayı denetleme gücünü elinde bulunduranlara siyasi ve ekonomik destek sağlamak",
+                exams: ["23-24 Final", "2022 Final", "2 Kez Çıktı!"]
+            },
+            {
+                q: "Beden dilinin iletişim sürecindeki yaklaşık ağırlığı (oranı) yüzde kaçtır?",
+                options: ["A) Yüzde 60", "B) Yüzde 50", "C) Yüzde 10", "D) Yüzde 30", "E) Yüzde 80"],
+                ans: "A) Yüzde 60",
+                exp: "İletişim araştırmacılarına göre sözsüz iletişim (beden dili, ses tonu vb.) iletişimin yaklaşık %60'ını oluşturur; sözlü iletişim ise daha küçük bir oranı kapsar.",
+                exams: ["23-24 Vize", "2022 Final", "2 Kez Çıktı!"]
+            },
+            {
+                q: "Eleştirel kitle iletişim kuramcılarının temel iddiaları aşağıdakilerden hangisidir?",
+                options: ["A) Medya iktidarın rıza üretme aracıdır.", "B) Kapitalizmin aksayan ve tıkanan yönleri iletişim araştırmaları ile tespit edilebilir.", "C) Medya ekonominin gelişmesini sağlayan temel etkendir.", "D) Halkın ekonomik ve kültürel gelişmesi ancak medya ile sağlanabilir.", "E) İletişim araştırmaları, ekonomik ilişkilerin düzenlenmesine hizmet etmelidir."],
+                ans: "A) Medya iktidarın rıza üretme aracıdır.",
+                exp: "Eleştirel kitle iletişim kuramcılarının temel tezi, medyanın tarafsız bir bilgi aktarım aracı olmadığı, aksine egemen sınıfın ideolojisini yayan ve rıza üreten bir araç olduğudur.",
+                exams: ["24-25 Büt", "2022 Final", "2 Kez Çıktı!"]
+            },
+            {
+                q: "Fransız Devrimi sırasında cumhuriyetin farklı bölümleri arasında hızlı haberleşmeyi sağlayan iletişim aracı aşağıdakilerden hangisidir?",
+                options: ["A) Kraliyet bülteni", "B) Gazete", "C) Atlı posta birlikleri", "D) Radyo", "E) Optik telgraf"],
+                ans: "E) Optik telgraf",
+                exp: "Fransız Devrimi döneminde cumhuriyetin farklı bölgeleri arasındaki hızlı haberleşme optik telgraf sistemiyle sağlanmıştır; telgraf telleri yoktu, ışık ve optik sinyaller kullanılıyordu.",
+                exams: ["24-25 Büt", "2022 Final", "2 Kez Çıktı!"]
+            },
+            {
+                q: "Basın özgürlüğünde önemli bir aşama olan, gazeteciliğin uzmanlık gerektiren bir meslek dalı olarak ayrışmaya başlaması hangi dönemde olmuştur?",
+                options: ["A) 18. yüzyıl sonları", "B) 18. yüzyıl başları", "C) 17. yüzyıl sonları", "D) 19. yüzyıl sonları", "E) 19. yüzyıl başları"],
+                ans: "D) 19. yüzyıl sonları",
+                exp: "⚠️ Sınav anahtarı uyarısı: | 24-25 Büt: D) 19. yüzyıl sonları | 2022 Final: E) 19. Yüzyıl Sonları",
+                exams: ["24-25 Büt", "2022 Final", "2 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi Frankfurt Okulu'nu ortaya çıkaran ve olgunlaşmasını sağlayan tarihsel olaylardan biri değildir?",
+                options: ["A) Adolf Hitler liderliğinde faşizmin yükselmesi", "B) ABD ve SSCB arasında başlayan Soğuk Savaş", "C) İkinci Dünya Savaşı'ndan sonra Batı'daki kapitalist rejimlerin istikrara kavuşması", "D) Birinci Dünya Savaşı'nın Almanya'da oluşturduğu hayal kırıklığı ve bunalımlar", "E) Bolşevik İhtilali'nin beklendiği gibi Avrupa'ya yayılmaması"],
+                ans: "B) ABD ve SSCB arasında başlayan Soğuk Savaş",
+                exp: "Frankfurt Okulu'nun doğuşunu ve gelişimini Birinci Dünya Savaşı'nın yarattığı hayal kırıklığı, Bolşevik İhtilali'nin Avrupa'ya yayılmaması ve faşizmin yükselmesi gibi olaylar tetiklemiştir; Soğuk Savaş ise okul kurulduktan sonra gerçekleşen ayrı bir süreçtir.",
+                exams: ["24-25 Büt", "23-24 Büt", "2 Kez Çıktı!"]
+            },
+            {
+                q: "İletişim ağları soyut ağlardır. İletişimi etkinleştirmek, aynı zamanda eşitliği ve demokrasiyi sağlamaktır. Bu görüşler aşağıdaki düşünürlerden hangisine aittir?",
+                options: ["A) Saint Simon", "B) Martin Luther King", "C) Max Weber", "D) Noelle-Neumann", "E) Arnold Toynbee"],
+                ans: "A) Saint Simon",
+                exp: "Saint Simon, iletişim ağlarını ve fiziksel altyapıyı (köprü, yol) yeni toplumsal örgütlenmenin temeli olarak görüyor; bu ağların eşitliği ve demokrasiyi desteklediğini savunuyordu.",
+                exams: ["24-25 Büt", "23-24 Büt", "2 Kez Çıktı!"]
+            },
+            {
+                q: "Toplumun bir konu hakkındaki genel kanaati şeklinde tanımlanan, kitlesel algı anlamına gelen kavram aşağıdakilerden hangisidir?",
+                options: ["A) Halk idaresi", "B) Kamuoyu", "C) Oydaşma", "D) Plebisit (halk oylaması)", "E) Demokratik kanaat"],
+                ans: "B) Kamuoyu",
+                exp: "Kamuoyu, toplumun belirli bir konu hakkındaki genel kanaatini ve kitlesel algısını ifade eden kavramdır; bireylerin bir araya geldiğinde oluşturduğu ortak görüşü yansıtır.",
+                exams: ["24-25 Büt", "23-24 Büt", "2 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi internetin olumsuz etkilerinden biri değildir?",
+                options: ["A) Patolojik bağımlılık yaratma riski bulunması", "B) Sanal mutluluklar ve hayal kırıklıkları oluşturması", "C) Bireyleri daha fazla yalnızlığa sürüklemesi", "D) Psikologların internetin insan sağlığı üzerindeki etkisine ilişkin kaygıları olması", "E) İnsanların bencilleşmelerine neden olması"],
+                ans: "E) İnsanların bencilleşmelerine neden olması",
+                exp: "⚠️ Sınav anahtarı uyarısı: | 24-25 Büt: E) İnsanların bencilleşmelerine neden olması | 23-24 Büt: C) Psikologların internetin insan sağlığı üzerindeki etkisine ilişkin kaygıları olması",
+                exams: ["24-25 Büt", "23-24 Büt", "2 Kez Çıktı!"]
+            },
+            {
+                q: "Kitle iletişim araçlarının iki aşamada kitleyi etkilediğini savunan iki aşamalı akış modelinde 'kanaat önderi' aşağıdakilerden hangisiyle tanımlanır?",
+                options: ["A) Kitle iletişim araçlarından kitleye mesajlarını gönderen kişidir.", "B) Kitleden daha az iletişim araçlarını kullandığı hâlde, baskın kişiliği ile grubu yönlendirebilen karizmatik kişiliktir.", "C) Kitle iletişim araçlarından aldığı iletiyi önderi olduğu grubun dünya görüşüne göre biçimlendirerek aktaran güvenilir kaynaktır.", "D) Bir topluluk ve grubun normal bir üyesi olup gündeme göre fikirleri ön plana çıkan kişidir.", "E) Yönlendirdiği kitleyi iletişim araçlarından uzak tutan ve sadece kendi kanaatlerini önemseyen kişidir."],
+                ans: "C) Kitle iletişim araçlarından aldığı iletiyi önderi olduğu grubun dünya görüşüne göre biçimlendirerek aktaran güvenilir kaynaktır.",
+                exp: "İki aşamalı akış modelinde kanaat önderi, kitle iletişim araçlarından aldığı mesajı kendi grubunun dünya görüşü ve değerleri çerçevesinde yorumlayarak gruba aktaran güvenilir bir aracıdır.",
+                exams: ["24-25 Büt", "23-24 Final", "2 Kez Çıktı!"]
+            },
+            {
+                q: "'Egemen olan görüş hiçbir zaman hakikatin tamamı değildir.' diyerek basın özgürlüğünün yasal teminat altına alınmasına katkı sağlayan düşünür aşağıdakilerden hangisidir?",
+                options: ["A) Thomas Hobbes", "B) Demokritos", "C) John Milton", "D) J. Jacques Rousseau", "E) John Stuart Mill"],
+                ans: "E) John Stuart Mill",
+                exp: "John Stuart Mill, 'Egemen olan görüş hiçbir zaman hakikatin tamamı değildir' diyerek fikir özgürlüğünü ve basın özgürlüğünü savunmuş; basının yasal güvence altına alınmasına katkı sağlamıştır.",
+                exams: ["24-25 Büt", "23-24 Final", "2 Kez Çıktı!"]
+            },
+            {
+                q: "Web 2.0'ın basit internetten (Web 1.0) en belirgin farkı aşağıdakilerden hangisidir?",
+                options: ["A) Kullanıcıların ve yayıncıların çevrim içi içeriklere ulaşabilmesi", "B) Karşılıklı etkileşime imkân vererek çok sayıda tüketicinin aynı zamanda üretici olması", "C) Bilginin web ortamında kolayca aranabilmesi", "D) Tek yönlü bir haber akışının olması", "E) Kullanıcıların web ortamında yayımlanan içerikleri takip edebilmesi"],
+                ans: "B) Karşılıklı etkileşime imkân vererek çok sayıda tüketicinin aynı zamanda üretici olması",
+                exp: "Web 2.0'ın Web 1.0'dan temel farkı etkileşimliliktir: kullanıcılar yalnızca içerik tüketmekle kalmaz, aynı zamanda içerik üretir, yorum yapar ve paylaşır.",
+                exams: ["24-25 Büt", "23-24 Final", "2 Kez Çıktı!"]
+            },
+            {
+                q: "Malların ve fikirlerin serbest dolaşımı ilkesinden yola çıkarak uluslararası iletişimin yaygınlaşmasında etkili olan temel akım aşağıdakilerden hangisidir?",
+                options: ["A) Marksizm", "B) Sosyalizm", "C) Faşizm", "D) Kapitalizm", "E) Liberalizm"],
+                ans: "E) Liberalizm",
+                exp: "Liberalizm, malların ve fikirlerin serbest dolaşımı ilkesini esas alarak uluslararası iletişimin gelişmesini ve küresel yayılmasını destekleyen temel ideolojik akımdır.",
+                exams: ["24-25 Büt", "23-24 Final", "2 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi etkili ve güzel konuşma için olması gereken şartlardan sayılamaz?",
+                options: ["A) Mikrofon kullanılması", "B) İlgi çekmesi ve dinleyicilerin hoşuna gitmesi", "C) Anlaşılır olması", "D) Kolay işitilebilir olması", "E) Akıcı olması"],
+                ans: "A) Mikrofon kullanılması",
+                exp: "Etkili sözlü iletişimin koşulları arasında akıcılık, anlaşılırlık, işitilebilirlik ve ilgi çekicilik sayılır; mikrofon kullanılması ise bir teknik araç tercihi olup sözlü iletişimin zorunlu koşullarından biri değildir.",
+                exams: ["24-25 Büt", "23-24 Vize", "2 Kez Çıktı!"]
+            },
+            {
+                q: "1927'de yayımlanan 'Dünya Savaşında Propaganda Teknikleri' kitabı aşağıdaki isimlerden hangisine aittir?",
+                options: ["A) Paul Felix Lazarsfeld", "B) Harold Lasswell", "C) G. Herbert Mead", "D) Carl Hovland", "E) Charles Cooley"],
+                ans: "B) Harold Lasswell",
+                exp: "Harold Lasswell, 1927'de yayımladığı 'Dünya Savaşında Propaganda Teknikleri' kitabıyla propaganda çalışmalarının öncüsü olmuş; iletişim araştırmalarına önemli katkılar sağlamıştır.",
+                exams: ["24-25 Final", "2022 Final", "2 Kez Çıktı!"]
+            },
+            {
+                q: "Siyasal ve ticari amaçlı bilgi ve kontrol ihtiyacının karşılanması için yayımlanan ilk gazeteler kaçıncı yüzyılda çıkmaya başlamıştır?",
+                options: ["A) 20. yüzyıl", "B) 19. yüzyıl", "C) 17. yüzyıl", "D) 18. yüzyıl", "E) 16. yüzyıl"],
+                ans: "E) 16. yüzyıl",
+                exp: "⚠️ Sınav anahtarı uyarısı: | 24-25 Final: E) 16. yüzyıl | 2022 Final: A) 16. Yüzyıl",
+                exams: ["24-25 Final", "2022 Final", "2 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi 20. yüzyıl başlarında basına yönelik eleştirilerin yükselmesinin nedenlerinden biri olamaz?",
+                options: ["A) Eleştirel niteliklerini yitirmeleri", "B) Aşırı ticarileşmeleri", "C) Dördüncü kuvvet olma özelliklerini kaybetmeleri", "D) İktidarların güdümüne girmeleri", "E) Gözcülük veya bekçilik yapmaları"],
+                ans: "E) Gözcülük veya bekçilik yapmaları",
+                exp: "Basın, dördüncü kuvvet ve gözetleme (bekçi köpeği) işlevini yerine getirdiğinde eleştiri değil alkış almalıdır; 20. yüzyıl başındaki eleştirilerin nedeni basının bu işlevini yitirmesi, aşırı ticarileşmesi ve iktidarların güdümüne girmesidir.",
+                exams: ["24-25 Final", "23-24 Büt", "2 Kez Çıktı!"]
+            },
+            {
+                q: "Bilişim teknolojilerinin gelişmesiyle ortaya çıkan, merkezsiz, hiyerarşisiz ve yatay ilişkilerin hâkim olduğu toplumsal örgütlenme biçimi aşağıdakilerden hangisidir?",
+                options: ["A) Organik toplum", "B) Ağ toplumu", "C) Dijital toplum", "D) Enformatik toplum", "E) Bilinçli toplum"],
+                ans: "B) Ağ toplumu",
+                exp: "Ağ toplumu, bilişim teknolojilerinin gelişmesiyle birlikte ortaya çıkan; hiyerarşisiz, merkezsiz ve yatay ilişkilerin egemen olduğu yeni toplumsal örgütlenme biçimini tanımlar.",
+                exams: ["24-25 Final", "23-24 Büt", "2 Kez Çıktı!"]
+            },
+            {
+                q: "Kaynak tarafından gönderilen mesajların teknolojik bir araç kullanılarak niteliği tam olarak bilinmeyen ve çok sayıda kişiden oluşan hedef kitleye ulaşmasıyla kurulan iletişim biçimi aşağıdakilerden hangisidir?",
+                options: ["A) Örgütsel iletişim", "B) Dış iletişim", "C) Grup iletişimi", "D) Kitle iletişimi", "E) Görsel iletişim"],
+                ans: "D) Kitle iletişimi",
+                exp: "⚠️ Sınav anahtarı uyarısı: | 24-25 Vize: D) Kitle iletişimi | 2022 Final: B) Kitle İletişimi",
+                exams: ["24-25 Vize", "2022 Final", "2 Kez Çıktı!"]
+            },
+            {
+                q: "Bir değer oluşturmak, bir duygu veya davranış değişikliği meydana getirmek üzere başlatılan sürece verilen ad aşağıdakilerden hangisidir?",
+                options: ["A) Korelasyon", "B) Gelişim", "C) Sembolik etkileşim", "D) İletişim", "E) Empati"],
+                ans: "D) İletişim",
+                exp: "İletişim, bir değer oluşturmak, duygu veya davranış değişikliği yaratmak amacıyla başlatılan sürecin adıdır; bu tanım iletişimin temel amacını ve işlevini yansıtır.",
+                exams: ["24-25 Vize", "2022 Final", "2 Kez Çıktı!"]
+            },
+            {
+                q: "Medyanın insanlara 'ne hakkında düşünmeleri gerektiğini' söylemesi ve benimsetmesi aşağıdakilerden hangisi ile açıklanabilir?",
+                options: ["A) Halkla ilişkileri sağlam tutma", "B) Propaganda yapma", "C) Gündem oluşturma", "D) Kamusal baskı oluşturma", "E) Medya denetimi sağlama"],
+                ans: "C) Gündem oluşturma",
+                exp: "Gündem oluşturma (agenda-setting) kuramı, medyanın insanlara 'ne hakkında düşünmeleri gerektiğini' belirleyerek kamuoyunun dikkatini yönlendirdiğini açıklar.",
+                exams: ["24-25 Vize", "23-24 Final", "2 Kez Çıktı!"]
+            },
+            {
+                q: "Kitle iletişiminin de diğer toplumsal sistemler gibi değerlendirilmesi ve toplumsal yapıyı etkileyen ve ondan etkilenen bir süreç olarak değerlendirilmesi gerektiğini savunan 'sosyolojik iletişim modeli' aşağıdakilerden hangisidir?",
+                options: ["A) Riley ve Riley modeli", "B) Gündem belirleme modeli", "C) Suskunluk sarmalı", "D) İletişim zinciri modeli", "E) Bağımlılık modeli"],
+                ans: "A) Riley ve Riley modeli",
+                exp: "Riley ve Riley modeli, kitle iletişimini diğer toplumsal sistemlerle etkileşim içinde değerlendiren sosyolojik bir modeldir; iletişimi toplumsal yapıyı hem etkileyen hem de ondan etkilenen bir süreç olarak ele alır.",
+                exams: ["24-25 Vize", "23-24 Vize", "2 Kez Çıktı!"]
+            },
+            {
+                q: "Döngüsel/dairesel iletişimin, çizgisel/doğrusal iletişimden temel farkı nedir?",
+                options: ["A) Referans çerçevelerinin kesişmesi", "B) Kaynak ve alıcının aynı ortamda olması", "C) Gürültü öğesinin olması", "D) Geri dönüş veya geri besleme (feedback) olması", "E) Kitle iletişim aracı kullanılması"],
+                ans: "D) Geri dönüş veya geri besleme (feedback) olması",
+                exp: "Çizgisel/doğrusal modellerde mesaj tek yönlü akar; döngüsel/dairesel modeli farklı kılan unsur ise alıcının kaynağa geri bildirim (feedback) yapabilmesidir.",
+                exams: ["24-25 Vize", "23-24 Vize", "2 Kez Çıktı!"]
+            },
+            {
+                q: "İlk iletişim araştırmaları hangi kitle iletişim araçları üzerine yapılmıştır?",
+                options: ["A) Radyo", "B) Gazete", "C) Yeni medyalar", "D) Televizyon", "E) Dergi"],
+                ans: "B) Gazete",
+                exp: "İlk sistematik kitle iletişim araştırmaları 20. yüzyılın başında gazete üzerine yapılmıştır; gazete o dönemin en yaygın kitle iletişim aracıydı.",
+                exams: ["24-25 Vize", "23-24 Vize", "2 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi 'iletişim'in tanımladığı eylemler arasında sayılamaz?",
+                options: ["A) Aktarmak", "B) Paylaşmak", "C) Rahatlamak", "D) Haberleşmek", "E) Anlam Üretmek"],
+                ans: "C) Rahatlamak",
+                exp: "İletişim; aktarma, paylaşma, haberleşme ve anlam üretme eylemlerini kapsar; 'rahatlamak' ise iletişimin değil psikolojik bir sürecin ürünüdür.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Bireyi, kendisinin de içinde bulunduğu toplumsal çerçeveye uyacak şekilde toplumsallaştıran gruplara 'toplumlaşma aracısı' denilmektedir. Aşağıdakilerden hangisi temel toplumsallaşma aracılarından birisi değildir?",
+                options: ["A) Aile", "B) Medya", "C) Eğitim Kurumları", "D) Ekonomik Gruplar", "E) Arkadaş Ve Akran Grupları"],
+                ans: "D) Ekonomik Gruplar",
+                exp: "Temel toplumsallaşma aracıları aile, eğitim kurumları, medya ve akran gruplarıdır; ekonomik gruplar bireyin değer ve normlarını şekillendirme bakımından temel toplumsallaşma aracısı sayılmaz.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Belli bir coğrafyada yaşayıp belli bir kültürü paylaşan, aralarında anlamlı bir etkileşim bulunan çok sayıda insanın oluşturduğu yapılara ne ad verilir?",
+                options: ["A) Toplum", "B) Topluluk", "C) İkincil Grup", "D) Birincil Grup", "E) Toplumsal Grup"],
+                ans: "A) Toplum",
+                exp: "Toplum kavramı; ortak bir coğrafyada yaşayan, ortak bir kültür paylaşan ve anlamlı sosyal ilişkiler ağı içindeki büyük insan topluluklarını tanımlar; bireylerinin toplamından daha büyük bir bütündür.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Türk basınında 'okur temsilciliği' olarak kurumsallaştırılan, kamu hizmetlerinin yürütülüşündeki adaletsizlikleri denetleyen bağımsız kamu otoritesi aşağıdakilerden hangisidir?",
+                options: ["A) Avukat", "B) Kapı Tutucu", "C) Ombudsman", "D) Kanaat Önderi", "E) Kamu Gözlemcisi"],
+                ans: "C) Ombudsman",
+                exp: "Ombudsman, kamu hizmetlerindeki haksızlıkları ve yönetim sorunlarını bağımsız biçimde denetleyen bir kamu görevlisidir; Türk basınında bu işlev 'okur temsilciliği' adıyla kurumsallaşmıştır.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Medyanın yasama, yürütme, yargı gibi bir denetleyici unsur olma özelliğini ifade eden kavram aşağıdakilerden hangisidir?",
+                options: ["A) Bekçi Köpeği", "B) Halk Gözcüsü", "C) Kanaat Önderi", "D) Beşinci Kuvvet", "E) Dördüncü Kuvvet"],
+                ans: "E) Dördüncü Kuvvet",
+                exp: "Medya, yasama, yürütme ve yargının yanı sıra toplumu denetleme işlevi gördüğü için 'dördüncü kuvvet' olarak adlandırılır; bu kavram medyanın demokraside üstlendiği gözetleme rolünü ifade eder.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Malların ve fikirlerin serbest dolaşım ilkesinden yola çıkarak uluslararası iletişimin yaygınlaşmasında etkili olan temel akım aşağıdakilerden hangisidir?",
+                options: ["A) Faşizm", "B) Marksizm", "C) Sosyalizm", "D) Kapitalizm", "E) Liberalizm"],
+                ans: "E) Liberalizm",
+                exp: "Liberalizm, mallar ve fikirler dahil her şeyin serbest dolaşımını savunarak uluslararası iletişimin yaygınlaşmasını teşvik eden temel ideolojik akımdır.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Frankfurt Okulu'nun kurulduğu tarih aşağıdakilerden hangisidir?",
+                options: ["A) 1917", "B) 1923", "C) 1933", "D) 1945", "E) 1965"],
+                ans: "B) 1923",
+                exp: "Frankfurt Okulu, 1923 yılında Almanya'nın Frankfurt kentinde Institut für Sozialforschung (Sosyal Araştırmalar Enstitüsü) adıyla kurulmuştur.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "İlk telgraf hattı aşağıdaki hangi ülkede kurulmuştur?",
+                options: ["A) İtalya", "B) Fransa", "C) Amerika", "D) İngiltere", "E) Almanya"],
+                ans: "C) Amerika",
+                exp: "İlk ticari telgraf hattı 1844'te Amerika Birleşik Devletleri'nde Samuel Morse tarafından Washington ile Baltimore arasında kurulmuştur.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "IP numaralarını veren Federal Ağ Konseyi hangi ülkede bulunmaktadır?",
+                options: ["A) ABD", "B) İsviçre", "C) Fransa", "D) İngiltere", "E) Almanya"],
+                ans: "A) ABD",
+                exp: "IP adreslerini dağıtan Federal Ağ Konseyi (Federal Networking Council) ABD'de bulunmaktadır; internet altyapısının yönetimi büyük ölçüde ABD merkezlidir.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "1774 yılında, bugünkü anlamda 'kamuoyu' (public opinion) kavramını ilk kullanan kimdir?",
+                options: ["A) J. Locke", "B) T. Adorno", "C) T. Hobbes", "D) İbn Haldun", "E) J. J. Rousseau"],
+                ans: "E) J. J. Rousseau",
+                exp: "J. J. Rousseau, 1774'te yazdığı eserinde 'kamuoyu' (public opinion) kavramını bugünkü anlamına yakın biçimde kullanan ilk düşünür olarak kabul edilmektedir.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Enformasyonun analog halinden bilgisayarlar tarafından okunabilen dijital formata dönüştürülmesine ne ad verilir?",
+                options: ["A) Sabitleme", "B) Formatlama", "C) Veri İletişimi", "D) Sayısallaştırma", "E) Elektronikleştirme"],
+                ans: "D) Sayısallaştırma",
+                exp: "Sayısallaştırma (dijitalleştirme), analog bilginin bilgisayarlar tarafından işlenebilecek dijital formata dönüştürülmesi sürecini ifade eder.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Tom Bottomore'a göre Frankfurt Okulu kaç tarihsel döneme ayrılarak incelenebilir?",
+                options: ["A) 3", "B) 4", "C) 5", "D) 6", "E) 7"],
+                ans: "B) 4",
+                exp: "Tom Bottomore, Frankfurt Okulu'nun tarihini kuruluş dönemi, Nazizm'den kaçış ve ABD yılları ile Frankfurt'a dönüş ve yeniden yapılanma olmak üzere dört tarihsel döneme ayırarak inceler.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Toplumun bir konu hakkındaki genel kanaati gibi tanımlanabilen, kitlesel algı anlamını veren kavram aşağıdaki seçeneklerden hangisi ile karşılanabilir?",
+                options: ["A) Oydaşma", "B) Kamuoyu", "C) Halk İdaresi", "D) Demokratik Kanaat", "E) Plebisit (Halk Oylaması)"],
+                ans: "B) Kamuoyu",
+                exp: "Kamuoyu, toplumun belirli bir konu hakkındaki genel kanaatini ve kitlesel algısını yansıtan kavramdır; bireylerin paylaştığı ortak görüş ve yargıların bütünüdür.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi iletişim alanında çalışmanın zorluklarından biri sayılamaz?",
+                options: ["A) Alanın genişliği", "B) Tanımlama zorluğu", "C) Disiplinler arası olması", "D) Doğrudan insanla ilgilenmesi", "E) Hem yüz yüze hem elektronik cihazlar yoluyla gerçekleşmesi"],
+                ans: "E) Hem yüz yüze hem elektronik cihazlar yoluyla gerçekleşmesi",
+                exp: "İletişim alanında çalışmanın zorluklarından biri, iletişimin farklı biçimlerinin (yüz yüze ve elektronik) bulunmasıdır; ancak bu çeşitlilik zorluğun değil iletişimin zenginliğinin göstergesidir.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Ağ sisteminde dolaşan internet içeriğinin uluslararası şirketlerce belirlenmesi, gelişmekte olan ülkelerin ağ teknolojisinden faydalanabilmek için gelişmiş ülkelere bağımlı olması hangi kavramla ifade edilebilir?",
+                options: ["A) Dijital Sömürgecilik", "B) Dolaylı Sömürgecilik", "C) İnternet Sömürgeciliği", "D) Masaüstü Sömürgecilik", "E) Konvansiyonel Sömürgecilik"],
+                ans: "D) Masaüstü Sömürgecilik",
+                exp: "İnternet içeriğinin uluslararası şirketlerce belirlenmesi ve gelişmekte olan ülkelerin ağ teknolojisi için gelişmiş ülkelere muhtaç olması 'masaüstü sömürgecilik' kavramıyla tanımlanmaktadır.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Frankfurt Okulu düşünürlerinin 1934'te New York'a göçmelerinin nedeni aşağıdakilerden hangisidir?",
+                options: ["A) ABD'den bilim adamlarına açık davet gelmesi", "B) Eleştirel kuramın ABD'de daha popüler olması", "C) Avrupa genelinde medya sektörünün yeterince gelişmemiş olması", "D) Almanya'da faşizmin iktidara gelmesiyle Nazilerin baskısının artması", "E) 1929 ekonomik krizi ile okulun maddi sıkıntılardan dolayı kapanması"],
+                ans: "D) Almanya'da faşizmin iktidara gelmesiyle Nazilerin baskısının artması",
+                exp: "Frankfurt Okulu düşünürleri, 1933'te Hitler'in iktidara gelmesi ve yükselen Nazi baskısı nedeniyle Almanya'yı terk ederek 1934'te New York'a göç etmek zorunda kalmıştır.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi 20. yy başlarında basına yönelik eleştirilerin yükselmesinin nedenlerinden biri olamaz?",
+                options: ["A) Aşırı ticarileşmeleri", "B) Eleştirel niteliklerini yitirmeleri", "C) İktidarların güdümüne girmeleri", "D) Gözcülük ve bekçilik yapmaları", "E) Dördüncü kuvvet olma özelliklerini kaybetmeleri"],
+                ans: "D) Gözcülük ve bekçilik yapmaları",
+                exp: "Basının dördüncü kuvvet ve gözcü işlevini yerine getirmesi, toplumun çıkarlarına hizmet etmesidir; dolayısıyla bu eleştiri konusu değil, gazeteciliğin ideal işlevi olarak değerlendirilmelidir.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Kitle iletişim araçlarıyla farklı ülke ve toplumlar arasındaki bilgi ve haber akışını sağlayan iletişim biçimi aşağıdakilerden hangisidir?",
+                options: ["A) Kitle iletişimi", "B) Uluslararası iletişim", "C) Yeni medya iletişimi", "D) Kültürler arası iletişim", "E) Dolaşım uygarlığı iletişimi"],
+                ans: "B) Uluslararası iletişim",
+                exp: "Uluslararası iletişim, kitle iletişim araçları aracılığıyla farklı ülkeler ve toplumlar arasındaki bilgi, haber ve içerik akışını sağlayan iletişim biçimidir.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi Frankfurt Okulu'nun çekirdek kadrosu içindeki düşünürlerden biri değildir?",
+                options: ["A) Max Weber", "B) Erich Fromm", "C) Herbert Marcuse", "D) Max Horkheimer", "E) Theodor Adorno"],
+                ans: "A) Max Weber",
+                exp: "Frankfurt Okulu'nun çekirdek kadrosu Adorno, Horkheimer, Marcuse, Fromm ve Pollock gibi isimlerden oluşur; Max Weber ise okulun kurucusu değil, Alman sosyolojisinin önemli bir temsilcisidir.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "'Ağ toplumu kavramı' aşağıdakilerden hangisi tarafından geliştirilmiştir?",
+                options: ["A) Max Weber", "B) Denis McQuail", "C) Erving Goffman", "D) Manuel Castells", "E) Marshall McLuhan"],
+                ans: "D) Manuel Castells",
+                exp: "Manuel Castells, 'Ağın Gücü' ve 'Enformasyon Çağı' gibi yapıtlarıyla ağ toplumu kavramını sistematik biçimde geliştiren ve küreselleştiren düşünürdür.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi eleştirel kuramcıların ilgilendikleri konular arasında sayılamaz?",
+                options: ["A) Kültür emperyalizmi", "B) Medya - İdeoloji ilişkisi", "C) Yabancılaşma ve fetişleştirme", "D) Bilinç yöntemi ve beyin yıkama", "E) Tüketicilerin medyayı kullanım amaçları"],
+                ans: "E) Tüketicilerin medyayı kullanım amaçları",
+                exp: "Eleştirel kuramcılar medya, ideoloji, kültür emperyalizmi, yabancılaşma ve güç ilişkileri üzerinde yoğunlaşır; tüketicilerin medyayı kullanım amacı ise kullanımlar ve doyumlar gibi liberal yaklaşımların ilgi alanıdır.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi 'akredite basın mensubu' kavramını ifade etmektedir?",
+                options: ["A) Ödüllü gazeteci", "B) Hükümete yakın gazeteci", "C) Freelance çalışan gazeteci", "D) Basın konseyine üye olan gazeteci", "E) Bazı kurum veya kuruluşların faaliyetlerini izleme izni almış gazeteci"],
+                ans: "E) Bazı kurum veya kuruluşların faaliyetlerini izleme izni almış gazeteci",
+                exp: "Akredite basın mensubu, yetkili makamlar tarafından belirli kurum veya organizasyonların faaliyetlerini izlemek ve haberleştirmek için resmi izin almış gazeteciye verilen addır.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Web 2.0'ın basit internetten (Web 1.0) en bariz farkı aşağıdakilerden hangisidir?",
+                options: ["A) Tek yönlü bir haber akışının olması", "B) Bilginin web ortamında kolayca aranabilmesi", "C) Kullanıcıların ve yayıncıların çevrim içi içeriklerine ulaşabilmesi", "D) Kullanıcıların web ortamında yayımlanan içerikleri takip edebilmesi", "E) Karşılıklı etkileşime imkân vererek çok sayıda tüketicinin aynı zamanda üretici olması"],
+                ans: "E) Karşılıklı etkileşime imkân vererek çok sayıda tüketicinin aynı zamanda üretici olması",
+                exp: "Web 2.0'ın Web 1.0'dan temel farkı, kullanıcıların pasif içerik tüketicisi olmaktan çıkıp aktif içerik üreticisine dönüşmesini sağlayan etkileşim ortamıdır.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi Liberal Yeni Kamusal Alan Yaklaşımı'nın görüşlerinden biri olamaz?",
+                options: ["A) İnternet, bilgi akışını destekleyen küresel bir mecradır.", "B) Yeni medyada bilgi de diğer içerikler gibi metalaşmıştır.", "C) Ortak menfaatleri olan insanlar için bir buluşma alanı sağlamıştır.", "D) Bilgiyi elinde tutan geleneksel seçkinler topluluğunun gücü azalmıştır.", "E) Gündelik işler internet ortamına taşınarak zamandan tasarruf edilmiştir."],
+                ans: "B) Yeni medyada bilgi de diğer içerikler gibi metalaşmıştır.",
+                exp: "Liberal Yeni Kamusal Alan Yaklaşımı'na göre internet bilgiye erişimi demokratikleştirir ve insanları buluşturur; bilginin metalaşması ise eleştirel yaklaşımların dile getirdiği bir argümandır.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi Frankfurt Okulu'nu ortaya çıkaran tarihsel olaylardan biri değildir?",
+                options: ["A) Adolf Hitler liderliğinde faşizmin yükselmesi", "B) ABD ve SSCB arasında başlayan soğuk savaş", "C) Bolşevik İhtilali'nin beklendiği gibi Avrupa'ya yayılmaması", "D) Birinci Dünya Savaşı'nın Almanya'da oluşturduğu hayal kırıklığı ve bunalımlar", "E) İkinci Dünya Savaşı'ndan sonra Batı'daki kapitalist rejimlerin istikrara kavuşması"],
+                ans: "B) ABD ve SSCB arasında başlayan soğuk savaş",
+                exp: "Frankfurt Okulu, faşizmin yükselişi, Birinci Dünya Savaşı travması ve sosyalist devrimin Avrupa'ya yayılmaması gibi olayların ürünüdür; ABD-SSCB Soğuk Savaşı okulun kuruluşundan sonra başlamıştır.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi 19. yy'ın ikinci yarısında Avrupalı sosyal bilimciler arasında modernizme karşı olumsuz bakış açısının yerleşmesine neden olan temel toplumsal nedenler arasında sayılamaz?",
+                options: ["A) Totaliter ve faşist yönetimlerin iktidara gelmesi", "B) Modernleşme ve demokrasi süreçlerinin yarattığı toplumsal karmaşa", "C) Sanayileşme ile dinin birey ve toplum hayatından çıkmaya başlaması", "D) İletişim araçlarının gelişmesinin toplumda merkezi bir konuma oturması", "E) Birinci ve İkinci Dünya Savaşlarında yaşanan ölümler, yıkımlar ve istikrarsızlık"],
+                ans: "B) Modernleşme ve demokrasi süreçlerinin yarattığı toplumsal karmaşa",
+                exp: "19. yüzyıl sonunda Avrupalı aydınlar arasında modernizme kuşkuyla yaklaşılmasına yol açan nedenler arasında savaşlar, faşizm ve sanayileşmenin yıkıcı etkileri sayılabilir; modernleşmenin ve demokrasinin yarattığı 'toplumsal karmaşa' ise bu eleştirel tutumun nedeni değil, modernleşmenin olumlu bir ürünüdür.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "İletişim sürecindeki öğelerden biri olan 'kodlama' aşağıdakilerden hangisi ile açıklanabilir?",
+                options: ["A) Tanımlanmamış beden dili hareketleridir.", "B) Elektronik bir cihaz yoluyla duygu, düşünce ve fikirleri hedef kitleye ulaştırmak", "C) İletişim sürecinin yazılı olması halinde hedefin mesajı tam olarak çözümleyememesi", "D) Kaynak ve hedefin aynı sosyal çevreden gelmeleri durumunda beden dili ile iletişim kurmaları", "E) Kaynak kişinin iletmek istediği duygu, düşünce ve fikirleri belli sembollere dönüştürerek şifrelemesi"],
+                ans: "E) Kaynak kişinin iletmek istediği duygu, düşünce ve fikirleri belli sembollere dönüştürerek şifrelemesi",
+                exp: "Kodlama, kaynağın iletmek istediği duygu, düşünce ve fikirleri karşı tarafın anlayabileceği sembollere, sözcüklere veya görüntülere dönüştürme işlemidir.",
+                exams: ["2022 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "IP numaralarını veren Federal Ağ Konseyi aşağıdaki ülkelerin hangisinde bulunmaktadır?",
+                options: ["A) ABD", "B) Fransa", "C) İsviçre", "D) Almanya", "E) İngiltere"],
+                ans: "A) ABD",
+                exp: "IP adreslerini tahsis eden Federal Ağ Konseyi ABD'de bulunmaktadır; bu durum internetin yönetiminin tarihsel olarak ABD merkezli olduğunu gösterir.",
+                exams: ["23-24 Büt", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi Avrupa'da güçlü bir kitle iletişim araştırmaları geleneği doğmasını yavaşlatan unsurlardan biri olarak sayılamaz?",
+                options: ["A) Avrupalı sosyal bilimcilerin modernizme mesafeli durması", "B) Avrupalı sosyal bilimcilerin kitle iletişimine karşı eleştirel yaklaşımları", "C) Avrupa'da radyonun uzun süre devlet tekelinde kalması", "D) Uydu teknolojileri konusunda SSCB'nin tecrübelerini Avrupa ile paylaşmaması", "E) ABD'ye göre Avrupa'da elektronik medyanın az gelişmiş olması"],
+                ans: "D) Uydu teknolojileri konusunda SSCB'nin tecrübelerini Avrupa ile paylaşmaması",
+                exp: "Avrupa'da kitle iletişim araştırmalarının geç gelişmesinin nedenleri arasında modernizme mesafeli duran Avrupalı sosyal bilimciler, devlet tekeli radyo ve zayıf elektronik medya sektörü sayılır; SSCB'nin uydu teknolojisi bilgisini paylaşmaması bu nedenler arasında yer almaz.",
+                exams: ["23-24 Büt", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi sanal cemaati eleştirenlerin ileri sürdükleri gerekçelerden biri olamaz?",
+                options: ["A) Dezavantajlılar için yeni bir iletişim alanıdır.", "B) Samimiyetten uzaktır.", "C) İnsanların zamanını çalar.", "D) Yabancılaşmayı artırır.", "E) Gerçek insan ilişkilerini zayıflatır."],
+                ans: "A) Dezavantajlılar için yeni bir iletişim alanıdır.",
+                exp: "Sanal cemaati eleştirenler; samimiyet eksikliği, zaman kaybı, yabancılaşma ve gerçek ilişkileri zayıflatma gibi sorunları öne sürer; dezavantajlılar için yeni bir iletişim alanı sunması ise sanal cemaatin olumlu bir yanıdır.",
+                exams: ["23-24 Büt", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Eleştirel kitle iletişim kuramcılarının görüşlerini dayandırdıkları, aynı zamanda sosyolojinin kurucuları arasında yer alan kişi aşağıdakilerden hangisidir?",
+                options: ["A) Saint Simon", "B) Karl Marx", "C) Auguste Comte", "D) Emile Durkheim", "E) Max Weber"],
+                ans: "B) Karl Marx",
+                exp: "Eleştirel kitle iletişim kuramcıları görüşlerini büyük ölçüde Karl Marx'ın toplumsal yapı, sınıf mücadelesi ve ideoloji analizine dayandırır.",
+                exams: ["23-24 Büt", "1 Kez Çıktı!"]
+            },
+            {
+                q: "1835'te kurulan ilk haber ajansı aşağıdakilerden hangisidir?",
+                options: ["A) United Press", "B) Reuter's", "C) Wolf Ajansı", "D) Associated Press", "E) Havas Ajansı (AFP)"],
+                ans: "E) Havas Ajansı (AFP)",
+                exp: "1835'te Fransa'da Charles-Louis Havas tarafından kurulan Havas Ajansı, dünyanın ilk haber ajansıdır; Reuters, AP ve diğerleri daha sonra kurulmuştur.",
+                exams: ["23-24 Büt", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi yazılı iletişimin sözlü iletişimden üstün yönleri arasında sayılamaz?",
+                options: ["A) Kaynaktan çıkan ileti hedefe aynen aktarılabilir.", "B) İletinin üçüncü kişilere aktarımında değişiklik riskini azaltır.", "C) Kaynak, beden dilini kullanamaz.", "D) İletinin kalıcı olarak kaydedilmesini sağlar.", "E) İletinin gönderilmeden önce kontrol ve denetlemesine imkân verir."],
+                ans: "C) Kaynak, beden dilini kullanamaz.",
+                exp: "Beden dilini kullanamamak yazılı iletişimin bir kısıtıdır; dolayısıyla bu özellik sözlü iletişim karşısında bir üstünlük değil, bir zayıflık sayılır.",
+                exams: ["23-24 Büt", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Sosyolojinin kurucu isimlerinden Max Weber, kapitalizmin gelişmesi ile aşağıdakilerden hangisi arasında doğrudan bir ilişki kurmaktadır?",
+                options: ["A) İnsan hakları", "B) Demokratik saygı", "C) Protestan ahlak (etik)", "D) Bireysel ahlak", "E) İş ahlakı"],
+                ans: "C) Protestan ahlak (etik)",
+                exp: "Max Weber, kapitalizmin Batı'da gelişmesini Protestanlığın getirdiği çalışma ahlakıyla ilişkilendirmiş; Protestan etiğinin birikimi ve tutumluluğu teşvik ederek kapitalist ruhun oluşmasına zemin hazırladığını savunmuştur.",
+                exams: ["23-24 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Birey belli bir toplumun içinde dünyaya gelir ve o toplumun kurallarını aşamalı olarak benimser ve toplumun bir parçası hâline gelir. Bireyin topluma uyum sağladığı bu sürece ne ad verilir?",
+                options: ["A) Toplumsal statü", "B) Toplumsal hareketlilik", "C) Toplumsal kontrol", "D) Toplumsallaşma", "E) Toplumsal norm"],
+                ans: "D) Toplumsallaşma",
+                exp: "Toplumsallaşma, bireyin doğduğu toplumun değer, norm ve kurallarını aşamalı olarak benimseyerek toplumun bir parçası haline gelmesini ifade eden süreçtir.",
+                exams: ["23-24 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Eleştirel teori ve edebiyat eleştirisi alanında çalışmalar yapmak amacıyla Birmingham Üniversitesi bünyesinde açılan Kültürel Çalışmalar Okulu'nun kurucusu aşağıdakilerden hangisidir?",
+                options: ["A) Richard Hoggart", "B) Stuart Hall", "C) Dennis McQuail", "D) Noam Chomsky", "E) Graham Murdock"],
+                ans: "A) Richard Hoggart",
+                exp: "İngiliz Kültürel Çalışmalar Okulu (Birmingham Okulu), 1964'te Birmingham Üniversitesi'nde Richard Hoggart tarafından kurulmuş; daha sonra Stuart Hall önderliğinde dünya çapında tanınırlık kazanmıştır.",
+                exams: ["23-24 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Bir toplumda olağan karşılanan bir el veya vücut hareketi bir başka toplumda tamamen yanlış anlaşılabilir. Bu durum sözsüz iletişimin (beden dili) aşağıdaki özelliklerinden hangisi ile ilgilidir?",
+                options: ["A) Sözsüz iletişimin her toplum tarafından kullanılmaması", "B) Kodlanan mesajlardan çıkarılan anlamların kültürden kültüre değişmesi", "C) Kaynak ve hedefin birincil ilişki içinde bulunması", "D) Sözsüz iletişimin her toplum için uygun olmaması", "E) Kaynak tarafından kodlanan mesajların karmaşık ve anlaşılmaz olması"],
+                ans: "B) Kodlanan mesajlardan çıkarılan anlamların kültürden kültüre değişmesi",
+                exp: "Beden dilinin anlamı evrensel değildir; aynı jest veya mimik farklı kültürlerde birbirinden çok farklı anlamlar taşıyabilir; bu durum sözsüz iletişimin kültüre bağlı olduğunu gösterir.",
+                exams: ["23-24 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Mesleğin şeref ve vakarını korumak üzere yasayla kurulan ve Türkiye'nin basın alanındaki ilk meslek örgütü aşağıdakilerden hangisidir?",
+                options: ["A) Türkiye Yayıncılar Birliği", "B) Basın Şeref Divanı", "C) Basın Yayın ve Enformasyon Müdürlüğü", "D) Türkiye Gazeteciler Sendikası", "E) Türk Basın Birliği"],
+                ans: "E) Türk Basın Birliği",
+                exp: "Türk Basın Birliği, 1946'da çıkarılan 4920 sayılı Kanun ile mesleğin onurunu korumak amacıyla kurulan Türkiye'nin basın alanındaki ilk yasal meslek örgütüdür.",
+                exams: ["23-24 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi konvansiyonel medyaya örnek olarak gösterilemez?",
+                options: ["A) Gazete", "B) E-gazete", "C) Televizyon", "D) Sinema", "E) Radyo"],
+                ans: "B) E-gazete",
+                exp: "Konvansiyonel (geleneksel) medya basılı gazete, televizyon, radyo ve sinema gibi araçları kapsar; e-gazete ise dijital teknolojiye dayanan yeni medya biçimidir.",
+                exams: ["23-24 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Frankfurt Okulu'nun kültür endüstrisi ve birey ilişkisi ile ilgili değerlendirmeleri dikkate alındığında aşağıdakilerden hangisi söylenemez?",
+                options: ["A) İnsan kültürel makinenin bir eklentisine indirgenmiştir.", "B) Kültür endüstrisi özerk ve bağımsız bireylerin yetişmesini sağlar.", "C) Müşteri kültür endüstrisinin öznesi değil nesnesidir.", "D) Kültür endüstrileri bireyleri kendilerine yaraşır bir dünyada yaşadıkları kanaatine ikna eder.", "E) Kültür endüstrileri insan öncelikli değildir."],
+                ans: "B) Kültür endüstrisi özerk ve bağımsız bireylerin yetişmesini sağlar.",
+                exp: "Frankfurt Okulu'na göre kültür endüstrisi, bireyleri edilgen tüketicilere dönüştürür ve sisteme entegre eder; özerk ve eleştirel bireyler yetiştirme iddiası ise kültür endüstrisinin tam tersidir.",
+                exams: ["23-24 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Ağ toplumu kavramını geliştiren kişi aşağıdakilerden hangisidir?",
+                options: ["A) Denis McQuail", "B) Marshall McLuhan", "C) Manuel Castells", "D) Erving Goffman", "E) Max Weber"],
+                ans: "C) Manuel Castells",
+                exp: "Manuel Castells, küresel enformasyon toplumunu ve yeni iktidar yapılarını inceleyen 'Enformasyon Çağı' üçlemesiyle ağ toplumu kavramını sosyolojiye kazandırmıştır.",
+                exams: ["23-24 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "İletişim sürecine iki temel yaklaşım biçimi: etkileme süreci olarak ..... yaklaşım, anlam üretme süreci olarak ..... yaklaşım. Boşluklara sırasıyla ne gelmelidir?",
+                options: ["A) noktasal / döngüsel", "B) özel / genel", "C) doğrusal / döngüsel", "D) kodlama / kod açma", "E) durağan / akışkan"],
+                ans: "C) doğrusal / döngüsel",
+                exp: "İletişime iki temel yaklaşım vardır: etkileme odaklı doğrusal (lineer) yaklaşım ve anlam üretme odaklı döngüsel yaklaşım; birincisi mesajın etkisine, ikincisi anlam müzakeresine odaklanır.",
+                exams: ["23-24 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Medyayı devletin ideolojik aygıtı olarak değerlendiren düşünür aşağıdakilerden hangisidir?",
+                options: ["A) Raymond Williams", "B) Theodor Adorno", "C) Herbert Schiller", "D) Louis Althusser", "E) Antonio Gramsci"],
+                ans: "D) Louis Althusser",
+                exp: "Louis Althusser, devletin baskı aygıtlarının yanı sıra okullar, medya ve kilise gibi 'ideolojik devlet aygıtları' aracılığıyla hâkimiyetini sürdürdüğünü öne sürmüş; medyayı bu ideolojik aygıtlar içinde konumlandırmıştır.",
+                exams: ["23-24 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "İlk kitle iletişim aracı aşağıdakilerden hangisidir?",
+                options: ["A) Sinema", "B) Sosyal Medya", "C) Televizyon", "D) Gazete", "E) Radyo"],
+                ans: "D) Gazete",
+                exp: "Gazete, 17. yüzyılda Avrupa'da yaygınlaşmaya başlayan ve tarihsel açıdan ilk kitle iletişim aracı olarak kabul edilen basın organıdır.",
+                exams: ["23-24 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Uluslararası iletişim düzenini eleştiren ve 1980'de UNESCO'ya sunulan raporu hazırlayan komisyonun adı aşağıdakilerden hangisidir?",
+                options: ["A) UNESCO Komisyonu", "B) McLuhan Komisyonu", "C) MacBride Komisyonu", "D) ITU Komisyonu", "E) BM İletişim Sorunları Komisyonu"],
+                ans: "C) MacBride Komisyonu",
+                exp: "1980'de UNESCO'ya sunulan 'Tek Bir Dünya, Çok Sesler' (MacBride Raporu), Sean MacBride başkanlığındaki MacBride Komisyonu tarafından hazırlanmış ve uluslararası iletişim dengesizliklerini eleştirmiştir.",
+                exams: ["23-24 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Frankfurt Okulu düşünürlerinin ABD'ye göç etmelerinin nedeni aşağıdakilerden hangisidir?",
+                options: ["A) Eleştirel kuramın ABD'de daha popüler olması", "B) Almanya'da faşizmin iktidara gelmesiyle Nazilerin baskısının artması", "C) ABD'den bilim insanlarına açık davet gelmesi", "D) 1929 ekonomik krizi ile okulun maddi sıkıntılardan dolayı kapanması", "E) Avrupa genelinde medya sektörünün yeterince gelişmemiş olması"],
+                ans: "B) Almanya'da faşizmin iktidara gelmesiyle Nazilerin baskısının artması",
+                exp: "Frankfurt Okulu düşünürleri, 1933'te Nazilerin Almanya'da iktidara gelmesi ve artan baskılar nedeniyle önce Cenevre'ye, ardından 1934'te New York'a göç etmek zorunda kalmıştır.",
+                exams: ["23-24 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi iletişimin temel ögelerinden biri değildir?",
+                options: ["A) Kanal", "B) Mesaj", "C) Gürültü", "D) Hedef", "E) Kaynak"],
+                ans: "C) Gürültü",
+                exp: "İletişimin temel öğeleri kaynak, mesaj, kanal, hedef ve gürültüden oluşur; 'gürültü' her ne kadar iletişimi etkileyen bir unsur olsa da kaynağın, mesajın, kanalın veya hedefin olmadığı durumlarda dahi iletişim teorik olarak var olabilir; ancak bazı modellerden gürültü dışarıda bırakılmıştır.",
+                exams: ["23-24 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Belli bir coğrafyada yaşayan, ortak bir kültürü paylaşan, çok sayıda insanın oluşturduğu, kendisini oluşturan bireylerin toplamından daha fazlasını içine alan, sosyal ilişkiler ağını ifade eden kavram aşağıdakilerden hangisidir?",
+                options: ["A) Sivil toplum kuruluşu", "B) Kurum", "C) Topluluk", "D) Toplum", "E) Cemaat"],
+                ans: "D) Toplum",
+                exp: "Toplum kavramı; belirli bir coğrafyada yaşayan, ortak kültürü paylaşan, aralarında sosyal ilişkiler ağı bulunan ve parçalarının toplamından fazlasını oluşturan büyük insan topluluğunu tanımlar.",
+                exams: ["23-24 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "İletişim sürecinde 'kaynak tarafından alıcıya ulaştırılmak üzere kodlanmış duygu, düşünce veya fikir' aşağıdakilerden hangisi ile ifade edilir?",
+                options: ["A) Kodlama ve kod açma", "B) Araç", "C) Hedef", "D) İleti veya mesaj", "E) Kaynak"],
+                ans: "D) İleti veya mesaj",
+                exp: "İleti veya mesaj; kaynağın alıcıya ulaştırmak üzere kodladığı duygu, düşünce, fikir ya da bilgiyi ifade eden iletişim öğesidir.",
+                exams: ["23-24 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Modernleşme hareketlerinin halka anlatılması ve benimsetilmesi amacıyla yayın hayatına başlayan, ilk Türkçe gazete aşağıdakilerden hangisidir?",
+                options: ["A) Takvim-i Vekayi", "B) Muhbir", "C) Cumhuriyet", "D) Meşveret", "E) Ceride-i Havadis"],
+                ans: "A) Takvim-i Vekayi",
+                exp: "Takvim-i Vekayi, 1831'de Osmanlı Devleti tarafından modernleşme hareketlerini halka duyurmak amacıyla çıkarılan ilk resmi Türkçe gazetedir.",
+                exams: ["23-24 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Kitle iletişim araçlarının 'toplumsal baskı ve rıza üretim aracı olması' aşağıdaki hangi yaklaşımın görüşüne uygundur?",
+                options: ["A) Makyavelist yaklaşım", "B) Muhafazakar yaklaşım", "C) Popülist yaklaşım", "D) Liberal yaklaşım", "E) Eleştirel yaklaşım"],
+                ans: "E) Eleştirel yaklaşım",
+                exp: "Eleştirel yaklaşım, medyanın egemen sınıfın ideolojisini yaymak ve toplumsal rızayı üretmek için kullanılan bir baskı aracı olduğunu öne sürer.",
+                exams: ["23-24 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Saint Simon, hem iletişim araçları, hem de köprü ve yolların yaygınlaşmasıyla 'dolaşım uygarlığı'nın farklı toplum ve insanları birbirleriyle buluşturduğunu ifade etmektedir. Saint Simon bu görüşleri hangi yaklaşıma örnek gösterilebilir?",
+                options: ["A) Dualist", "B) Determinist", "C) Oportünist", "D) Kapitalist", "E) Marksist"],
+                ans: "B) Determinist",
+                exp: "Saint Simon, iletişim ağlarını ve ulaşım altyapısını toplumsal ilerlemenin itici gücü olarak gördüğünden, bu yaklaşımı teknolojinin toplumu belirlediğini savunan 'teknolojik determinizm' olarak değerlendirilebilir.",
+                exams: ["23-24 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Demokrasinin olmazsa olmaz koşulu halk tarafından rıza gösterilmesidir. Demokrasilerde, halk iktidarı çeşitli yöntemlerle denetler ve rızası olup olmadığını gösterir. Aşağıdakilerden hangisi siyasal iktidarı denetleme araçlarından biri sayılamaz?",
+                options: ["A) İkinci sektör (ticari kuruluşlar)", "B) Medya", "C) Kamuoyu", "D) Seçimler", "E) Üçüncü sektör (STK)"],
+                ans: "A) İkinci sektör (ticari kuruluşlar)",
+                exp: "Demokratik sistemlerde siyasal iktidarı denetleme işlevini medya, kamuoyu, seçimler ve STK'lar gibi mekanizmalar üstlenir; ticari kuruluşlar (ikinci sektör) ise kar güdüsüyle hareket eden özel aktörler olup siyasi denetim aracı sayılmaz.",
+                exams: ["23-24 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Tek yönlü çizgisel modellerden biri olan Shannon ve Weaver'in matematiksel iletişim modelinde iletişimin öğelerinden hangisi bulunmaz?",
+                options: ["A) Gürültü", "B) Hedef", "C) Kaynak", "D) Araç", "E) Geridönüş"],
+                ans: "E) Geridönüş",
+                exp: "Shannon ve Weaver'in matematiksel iletişim modeli kaynak, kodlayıcı, kanal, kod çözücü, hedef ve gürültü öğelerini içerir; ancak tek yönlü bir model olduğu için geri bildirim (feedback) bu modelde yer almaz.",
+                exams: ["23-24 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Bugünkü anlamına yakın bir kamuoyu kavramı daha çok hangi dönemin bir ürünü olarak ortaya çıkmıştır?",
+                options: ["A) Antik Yunan", "B) Reform", "C) Soğuk savaş", "D) Rönesans", "E) Aydınlanma"],
+                ans: "E) Aydınlanma",
+                exp: "Modern anlamda kamuoyu kavramı, Aydınlanma döneminde (18. yüzyıl) burjuvazinin kamusal alanda tartışma ve eleştiri özgürlüğü kazanmasıyla birlikte anlam kazanmıştır.",
+                exams: ["23-24 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi iletişimin kapsadığı eylemler arasında yer almaz?",
+                options: ["A) Paylaşmak", "B) Rahatlatmak", "C) Anlam üretmek", "D) Aktarmak", "E) Haberleşmek"],
+                ans: "B) Rahatlatmak",
+                exp: "İletişim; paylaşmak, anlam üretmek, aktarmak ve haberleşmek gibi eylemler içerir; 'rahatlatmak' ise iletişimin değil, terapötik bir sürecin işlevidir.",
+                exams: ["23-24 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Kitlelerin yönlendirilebileceği ve manipüle edilebileceği gerçeğine dayanarak medyayı bir savaş ve mücadele aracı olarak kullanan iletişim yöntemi aşağıdakilerden hangisidir?",
+                options: ["A) Propaganda", "B) Reklam", "C) Halkla ilişkiler", "D) Lobicilik", "E) Haber"],
+                ans: "A) Propaganda",
+                exp: "Propaganda, kitleleri belirli bir doğrultuda yönlendirmek ve manipüle etmek amacıyla medyayı bir mücadele aracı olarak kullanan sistematik iletişim yöntemidir.",
+                exams: ["23-24 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi iletişim sosyolojisi disiplininin çalışma alanlarından biri değildir?",
+                options: ["A) Kitle kültürü ve popüler kültür", "B) Beden dili", "C) Ağ toplumu", "D) Kariyer planlama", "E) Toplumsallaşma"],
+                ans: "D) Kariyer planlama",
+                exp: "İletişim sosyolojisinin çalışma alanları kitle kültürü, toplumsallaşma, ağ toplumu, beden dili ve medya-toplum ilişkilerini kapsar; kariyer planlama ise bireysel bir yönelim olup bu disiplinin konusu değildir.",
+                exams: ["23-24 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "İnsanoğlunun kullandığı ilk iletişim türü aşağıdakilerden hangisidir?",
+                options: ["A) İç iletişim", "B) Sözlü iletişim", "C) Sözsüz iletişim", "D) Yazılı iletişim", "E) Grup iletişimi"],
+                ans: "C) Sözsüz iletişim",
+                exp: "İnsanoğlunun kullandığı ilk iletişim biçimi sözsüz iletişimdir; jestler, mimikler ve beden hareketleri dil gelişmeden çok önce ortaya çıkmış ve evrimsel açıdan en eski iletişim biçimini oluşturmuştur.",
+                exams: ["23-24 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Bireyi, kendisinin de içinde bulunduğu toplumsal çevreye uyacak şekilde toplumsallaştıran gruplara 'toplumsallaşma aracısı' denilmektedir. Aşağıdakilerden hangisi temel toplumsallaşma aracılarından biri değildir?",
+                options: ["A) Eğitim kurumları", "B) Medya", "C) Arkadaş ve akran grupları", "D) Ekonomik gruplar", "E) Aile"],
+                ans: "D) Ekonomik gruplar",
+                exp: "Temel toplumsallaşma aracıları aile, okul, medya ve akran gruplarıdır; ekonomik gruplar bireyin kişiliğini ve değerlerini biçimlendirme açısından temel toplumsallaşma aracısı sayılmaz.",
+                exams: ["23-24 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "İletişim kavramının Latince kökeni olan 'commun' kelimesi ne anlama gelmektedir?",
+                options: ["A) Görmek", "B) Paylaşmak", "C) İletmek", "D) Yaymak", "E) Sevmek"],
+                ans: "B) Paylaşmak",
+                exp: "'İletişim' sözcüğünün Latince kökü olan 'communis' ya da 'commun', 'ortak' ve 'paylaşmak' anlamına gelir; iletişimin özünün paylaşım olduğunu vurgular.",
+                exams: ["23-24 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi iletişim ve medya konusunda sosyal bilimcileri bilimsel çalışma yapmaya sevk eden faktörlerden biri sayılamaz?",
+                options: ["A) Medyanın en önemli toplumsallaşma aracılarından biri olması", "B) Kitlesel bir iletişim aracı olan medyanın modern toplumun en etkin kurumlarından biri olması", "C) Dünyadaki milyarlarca insanın günlük hayatının önemli bir kısmını işgal etmesi", "D) Üç boyutlu televizyon teknolojilerinin geliştirilmesi", "E) 4. kuvvet olarak medyanın kamuoyunun haber alma özgürlüğünün teminatı olması"],
+                ans: "D) Üç boyutlu televizyon teknolojilerinin geliştirilmesi",
+                exp: "Sosyal bilimcileri medya üzerinde çalışmaya yönlendiren etkenler arasında medyanın toplumsallaşma işlevi, kamuoyunu şekillendirme gücü ve dördüncü kuvvet rolü sayılabilir; 3D televizyon teknolojisi ise bilimsel çalışma motivasyonuyla ilgisizdir.",
+                exams: ["24-25 Büt", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Sosyolojik düşünmek kavramı aşağıdakilerden hangisidir?",
+                options: ["A) Sosyal olayları anlamak için uzman görüşüne başvurmaktır.", "B) Bireysel olanda sosyal olanı, tikel olanda genel olanı görebilmektir.", "C) Bir arada yaşamak için gerekli olan düşünme şeklidir.", "D) Duyarlı davranarak topluma zarar vereceğini düşündüğümüz şeylere engel olmaktır.", "E) Dışa dönük yaşamak, sosyal olmak demektir."],
+                ans: "B) Bireysel olanda sosyal olanı, tikel olanda genel olanı görebilmektir.",
+                exp: "Sosyolojik düşünmek; bireylerin yaşantılarının arkasındaki toplumsal güçleri görebilmek, yani bireysel olanın içindeki toplumsal olanı ve özelin içindeki geneli fark edebilmektir.",
+                exams: ["24-25 Büt", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi Avrupalı sosyal bilimciler arasında modernizme karşı eleştirel bir bakış açısının yerleşmesine neden olan temel nedenler arasında sayılamaz?",
+                options: ["A) Birinci ve İkinci Dünya Savaşı'nda yaşanan ölümler, yıkımlar ve istikrarsızlık", "B) Modernleşme ve demokrasi süreçlerinin yarattığı toplumsal karmaşa", "C) Totaliter ve faşist yönetimlerin iktidara gelmesi", "D) Sanayileşme ile dinin birey ve toplum hayatından çıkmaya başlaması", "E) İletişim araçlarının gelişmesinin toplumda merkezî bir konuma oturması"],
+                ans: "E) İletişim araçlarının gelişmesinin toplumda merkezî bir konuma oturması",
+                exp: "Avrupalı aydınlar arasında modernizme karşı eleştirel tavrın yerleşmesinde savaşlar, faşizm ve sanayileşmenin toplumsal tahribatı belirleyici olmuştur; iletişim araçlarının güçlenmesi ise modernizmin kendi ürünü olup eleştirel tutumun değil modernleşmenin bir göstergesidir.",
+                exams: ["24-25 Büt", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Howard Rheingold tarafından geliştirilen ve fikirlerini ağ teknolojisi üzerinden paylaşan sanal toplulukları ifade etmek için kullanılan kavram aşağıdakilerden hangisidir?",
+                options: ["A) Sanal cemaat", "B) Sanal takım", "C) Küresel ekip", "D) Dijital tim", "E) Web cemaati"],
+                ans: "A) Sanal cemaat",
+                exp: "Howard Rheingold, 1993 tarihli 'Virtual Community' kitabında ağ teknolojileri aracılığıyla kurulan online toplulukları tanımlamak için 'sanal cemaat' kavramını geliştirmiştir.",
+                exams: ["24-25 Büt", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Felsefenin bir dalı olan etik ile ilgili aşağıdaki ifadelerden hangisi yanlıştır?",
+                options: ["A) Bir eylemi iyi/kötü ya da doğru/yanlış yapan unsurların ne olduğu üzerinde durur.", "B) Ahlaki kavramları analiz eder.", "C) Ahlaki eylemin bilimidir. İnsan pratiğini, var olan ahlakilik koşulları açısından araştırır.", "D) Dinî kurallarla bağlantılı olarak kişilerarası ilişkilerin kurallarını araştırır.", "E) Ahlaki sorunlar ve ahlaki yargılar hakkında felsefi düşünmedir."],
+                ans: "D) Dinî kurallarla bağlantılı olarak kişilerarası ilişkilerin kurallarını araştırır.",
+                exp: "Etik, ahlaki doğru/yanlış, iyi/kötü ve bu yargıların felsefi temellerini inceleyen felsefe dalıdır; dinî kurallarla doğrudan bağlantılı değildir, laik ve evrensel bir felsefi disiplindir.",
+                exams: ["24-25 Büt", "1 Kez Çıktı!"]
+            },
+            {
+                q: "'Kültür endüstrisinin kavramsallaştırması' aşağıdaki düşünürlerin hangisi veya hangileri tarafından geliştirilmiştir?",
+                options: ["A) Tom Bottomore", "B) H. Marcuse ve E. Fromm", "C) T. Adorno ve M. Horkheimer", "D) F. Weil ve F. Pollock", "E) Carl Grünberg"],
+                ans: "C) T. Adorno ve M. Horkheimer",
+                exp: "Kültür endüstrisi kavramı, Frankfurt Okulu'nun önde gelen isimleri Theodor Adorno ve Max Horkheimer tarafından 1944'te yayımlanan 'Aydınlanmanın Diyalektiği' adlı yapıtta kavramsallaştırılmıştır.",
+                exams: ["24-25 Büt", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Mesleğin şeref ve vakarını korumak üzere yasayla kurulan Türkiye'nin basın alanındaki ilk meslek örgütü aşağıdakilerden hangisidir?",
+                options: ["A) Basın Yayın ve Enformasyon Müdürlüğü", "B) Türkiye Yayıncılar Birliği", "C) Türk Basın Birliği", "D) Basın Şeref Divanı", "E) Türkiye Gazeteciler Sendikası"],
+                ans: "C) Türk Basın Birliği",
+                exp: "Türk Basın Birliği, 1946'da 4920 sayılı Basın Birliği Kanunu ile kurulan ve Türkiye'de basın mesleğini düzenleyen ilk yasal meslek örgütüdür.",
+                exams: ["24-25 Büt", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi Frankfurt Okulu'nun düşünürlerinden biri değildir?",
+                options: ["A) Herbert Marcuse", "B) Theodor Adorno", "C) Erich Fromm", "D) Max Weber", "E) Max Horkheimer"],
+                ans: "D) Max Weber",
+                exp: "Frankfurt Okulu'nun çekirdek kadrosu Horkheimer, Adorno, Marcuse, Fromm, Pollock ve Löwenthal gibi isimlerden oluşur; Max Weber bu okulun üyesi değil, Alman sosyolojisinin bağımsız bir kurucu ismidir.",
+                exams: ["24-25 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Dawson'a göre sanal cemaat olarak nitelendirilebilmesi için üyeler hangi koşulları sağlamalıdır? Hangisi bu koşullar arasında sayılamaz?",
+                options: ["A) Üyeler üzerinde sosyal kontrolün bulunması", "B) Sitedeki interaktivitelerin üyelerin ilgi alanlarına uygun olması", "C) Üyelerin sabit bir kullanıcı adına sahip olması", "D) Üyeler arasında etkileşimin olması", "E) Üyeler arasındaki etkileşimin süreklilik arz etmemesi"],
+                ans: "E) Üyeler arasındaki etkileşimin süreklilik arz etmemesi",
+                exp: "Dawson'a göre sanal cemaat sayılabilmek için üyeler arasında sürekli etkileşim, sabit kimlik ve sosyal kontrol gibi koşullar aranır; etkileşimin sürekli olmaması ise sanal cemaatin değil, rastlantısal online buluşmaların özelliğidir.",
+                exams: ["24-25 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Amerika-Irak Savaşı ile popüler hâle gelen, savaşı askerlerin gözüyle yansıtan muhabirlik anlayışı hangi kavramla ifade edilir?",
+                options: ["A) Gölge gazetecilik", "B) Taraflı gazetecilik", "C) Yönlendirilmiş gazetecilik", "D) İliştirilmiş gazetecilik", "E) Dominant gazetecilik"],
+                ans: "D) İliştirilmiş gazetecilik",
+                exp: "İliştirilmiş (embedded) gazetecilik, Amerika-Irak Savaşı'nda askeri birliklere dahil edilerek savaşı askerlerin perspektifinden haberleştiren muhabirlik anlayışıdır.",
+                exams: ["24-25 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi bireyler arası iletişimin olmazsa olmaz şartlarından biridir?",
+                options: ["A) Kaynak ve hedef olmak üzere en az iki kişinin olması", "B) Kaynak ve hedefin eş zamanlı iletişim kurması", "C) Kaynak ve hedefin aynı mekânda olması", "D) Sözlü iletişim yöntemini kullanmaları", "E) Teknolojik bir araç kullanılması"],
+                ans: "A) Kaynak ve hedef olmak üzere en az iki kişinin olması",
+                exp: "Bireyler arası iletişimin zorunlu koşulu, kaynak ve hedef olmak üzere en az iki kişinin bulunmasıdır; aynı mekânda olmak, eş zamanlılık veya teknolojik araç kullanımı ise zorunlu değildir.",
+                exams: ["24-25 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Dünyanın 'büyük bir endüstri şirketi' gibi yönetilmesini savunan ve iletişim ağlarını bu yeni toplumsal örgütlenmenin simgesi olarak gören düşünür aşağıdakilerden hangisidir?",
+                options: ["A) Saint Simon", "B) Marquis de Condercet", "C) Max Horkheimer", "D) Samuel Morse", "E) Karl Polanyi"],
+                ans: "A) Saint Simon",
+                exp: "Saint Simon, dünyayı büyük bir sanayi şirketi gibi yönetmek istemiş ve iletişim ağlarını bu yeni toplumsal düzenin belkemiği olarak konumlandırmıştır.",
+                exams: ["24-25 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Medyanın içeriğinden çok ekonomik yapısı üzerinde yoğunlaşan eleştirel yaklaşım aşağıdakilerden hangisidir?",
+                options: ["A) Sosyalist Feminizm", "B) Kültürel Çalışmalar Yaklaşımı", "C) Ekonomi-politik Yaklaşım", "D) Frankfurt Okulu", "E) Kültür Endüstrisi"],
+                ans: "C) Ekonomi-politik Yaklaşım",
+                exp: "Politik ekonomi yaklaşımı, medyanın içeriğinden ziyade sahiplik yapısı, piyasa ilişkileri ve ekonomik güç odaklarını inceleyen eleştirel bir iletişim kuramıdır.",
+                exams: ["24-25 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi ABD ile kıyaslandığında Avrupa'da güçlü bir kitle iletişim araştırmaları geleneği doğmasını yavaşlatan unsurlardan biri olarak sayılamaz?",
+                options: ["A) Uydu teknolojileri konusunda SSCB'nin tecrübelerini Avrupa ile paylaşmaması", "B) Avrupalı sosyal bilimcilerin modernizme mesafeli durması", "C) ABD'ye göre Avrupa'da elektronik medyanın az gelişmiş olması", "D) Avrupalı sosyal bilimcilerin kitle iletişimine karşı eleştirel yaklaşımları", "E) Avrupa'da radyonun uzun süre devlet tekelinde kalması"],
+                ans: "D) Avrupalı sosyal bilimcilerin kitle iletişimine karşı eleştirel yaklaşımları",
+                exp: "Avrupa'da iletişim araştırmalarının geç kalmasının nedenleri arasında modernizme mesafeli sosyal bilimciler, eleştirel yaklaşımlar, devlet tekelindeki radyo ve zayıf elektronik medya sektörü sayılır; SSCB ile uydu teknolojisi bilgisi paylaşımının olmaması bu nedenler arasında yer almaz.",
+                exams: ["24-25 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi iletişimin temel öğelerinden biri değildir?",
+                options: ["A) Kaynak", "B) Kanal", "C) Mesaj", "D) Gürültü", "E) Hedef"],
+                ans: "D) Gürültü",
+                exp: "İletişimin temel öğeleri kaynak, mesaj (ileti), kanal ve hedeftir; 'empati' ise iletişimi kolaylaştıran psikolojik bir beceri olup temel bir iletişim öğesi değildir.",
+                exams: ["24-25 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Frankfurt Okulunun kurulma tarihi aşağıdakilerden hangisidir?",
+                options: ["A) 1933", "B) 1945", "C) 1923", "D) 1965", "E) 1917"],
+                ans: "C) 1923",
+                exp: "Frankfurt Okulu (Sosyal Araştırmalar Enstitüsü), 1923 yılında Almanya'nın Frankfurt kentinde kurulmuştur.",
+                exams: ["24-25 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Enformasyonun analog hâlinden bilgisayarlar tarafından okunabilen dijital formata dönüştürülmesine verilen ad aşağıdakilerden hangisidir?",
+                options: ["A) Sayısallaştırma", "B) Elektronikleştirme", "C) Formatlama", "D) Sabitleme", "E) Veri iletişimi"],
+                ans: "A) Sayısallaştırma",
+                exp: "Sayısallaştırma, analog bilginin (ses, görüntü, metin) ikili (binary) dijital koda dönüştürülerek bilgisayarlar tarafından işlenebilir ve iletilir hale getirilmesi sürecidir.",
+                exams: ["24-25 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Bir mesleği uygularken uyulması gereken etik kuralları ve meslek ahlakını inceleyen bilim dalı aşağıdakilerden hangisidir?",
+                options: ["A) Hipokrat", "B) Etnometodoloji", "C) Deontoloji", "D) Dermatoloji", "E) Etimoloji"],
+                ans: "C) Deontoloji",
+                exp: "Mesleki etik, bir mesleği icra ederken uyulması gereken etik ilkeleri ve mesleki ahlak kurallarını inceleyen uygulama felsefesi alanıdır.",
+                exams: ["24-25 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Açık bir biçimde kamuoyu ve toplumsal kuralları güçlendirme işlevi gören medya ile ilgili 'toplumsal denetim' yaklaşımını geliştiren iletişim bilimci aşağıdakilerden hangisidir?",
+                options: ["A) Marshall McLuhan", "B) Harold D. Lasswell", "C) P. Felix Lazarsfeld", "D) Charles Cooley", "E) John Dewey"],
+                ans: "E) John Dewey",
+                exp: "Lazarsfeld ve Merton, medyanın açıkça kamuoyunu güçlendirdiği ve toplumsal normları pekiştirdiği işlevini 'toplumsal merkezileşme' (narcotizing dysfunction) kavramıyla açıklamıştır.",
+                exams: ["24-25 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Demokrasinin olmazsa olmaz koşulu halk tarafından rıza gösterilmesidir. Aşağıdakilerden hangisi siyasal iktidarı denetleme araçlarından biri sayılamaz?",
+                options: ["A) Üçüncü sektör (STK)", "B) İkinci sektör (ticari kuruluşlar)", "C) Medya", "D) Seçimler", "E) Kamuoyu"],
+                ans: "B) İkinci sektör (ticari kuruluşlar)",
+                exp: "Demokratik sistemlerde siyasal iktidarı denetleyen başlıca unsurlar medya, seçimler, kamuoyu ve sivil toplum kuruluşlarıdır; ticari kuruluşlar kar odaklı yapıları nedeniyle bu kategoride yer almaz.",
+                exams: ["24-25 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi yeni toplumsal hareketlerin özelliklerinden biri değildir?",
+                options: ["A) Bireysel eylemler için imkân sunar.", "B) Yerel bireysel eylemcileri radikalleştirir.", "C) Sosyal ağlar üzerinden örgütlenir.", "D) Merkezsizdir.", "E) Hiyerarşi içermez."],
+                ans: "B) Yerel bireysel eylemcileri radikalleştirir.",
+                exp: "Yeni toplumsal hareketler; küresel, hiyerarşiden uzak, kimlik siyaseti temelli ve sivil itaatsizliğe başvuran özellikler taşır; hiyerarşik örgüt yapısı ise eski/geleneksel toplumsal hareketlerin özelliğidir.",
+                exams: ["24-25 Final", "1 Kez Çıktı!"]
+            },
+            {
+                q: "İletişim sürecindeki ögelerden biri olan 'kodlama' aşağıdakilerden hangisi ile açıklanabilir?",
+                options: ["A) İletişim sürecinin yazılı olması hâlinde, hedefin mesajı tam olarak çözümleyememesine neden olan durumdur.", "B) Kaynak ve hedefin aynı sosyal çevreden gelmeleri durumunda iletişimlerini beden dili ile gerçekleştirmeleridir.", "C) Elektronik bir cihaz yoluyla duygu, düşünce ve fikirlerin hedef kitleye ulaştırılmasıdır.", "D) Kaynak kişinin iletmek istediği duygu, düşünce ve fikirleri belli sembollere dönüştürerek bir nevi şifrelemesidir.", "E) Tanımlanmamış beden dili hareketleridir."],
+                ans: "D) Kaynak kişinin iletmek istediği duygu, düşünce ve fikirleri belli sembollere dönüştürerek bir nevi şifrelemesidir.",
+                exp: "Kodlama, kaynağın iletmek istediği duygu, düşünce ve fikirleri sözcükler, semboller veya görüntüler aracılığıyla belirli bir koda dönüştürmesidir.",
+                exams: ["24-25 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aralarında birlik veya belli bir düzen olan veya zaman içinde tekrarlanan, ilerleyen, gelişen olay ve hareketler dizisi olarak tanımlanan kavram aşağıdakilerden hangisidir?",
+                options: ["A) İş birliği", "B) Süreç", "C) Koordinasyon", "D) İletişim", "E) İlişki"],
+                ans: "B) Süreç",
+                exp: "Süreç; aralarında bir düzen ya da birlik olan, zaman içinde tekrarlanan, ilerleyen veya gelişen olay ve hareketler dizisini ifade eden kavramdır.",
+                exams: ["24-25 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi etkili bir sözlü iletişim için gerekli olan şartlardan biri olarak sayılamaz?",
+                options: ["A) Dinleyici ile göz teması kurmak", "B) Uzlaşmacı ve empatik olmak", "C) Alıcının anlayacağı biçimde iletişim kurmak", "D) Sesin rengini, tonunu, üslubunu ayarlamak", "E) Konuşmayı tecrübeli kişilere uygun yapmak"],
+                ans: "E) Konuşmayı tecrübeli kişilere uygun yapmak",
+                exp: "Etkili sözlü iletişimin koşulları arasında akıcılık, anlaşılırlık, işitilebilirlik ve ilgi çekicilik yer alır; mikrofon kullanımı ise fiziksel bir araç tercihidir, sözlü iletişimin olmazsa olmaz koşulu değildir.",
+                exams: ["24-25 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "20. yüzyılın başlarında ilk iletişim araştırmaları aşağıda yer alan hangi ülkede başlamıştır?",
+                options: ["A) ABD", "B) Kanada", "C) Almanya", "D) İngiltere", "E) Fransa"],
+                ans: "A) ABD",
+                exp: "İletişim araştırmaları 20. yüzyılın başında Amerika Birleşik Devletleri'nde, özellikle Chicago Üniversitesi çatısı altında başlamıştır.",
+                exams: ["24-25 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "İletişim sosyolojisi ve medya sosyolojisi disiplinlerinin ilgi alanlarıyla ilgili aşağıdaki ifadelerden hangisi doğrudur?",
+                options: ["A) Yüz yüze iletişim ve örgütsel iletişim medya sosyolojisinin temel ilgi alanlarındandır.", "B) İletişim sosyolojisi, medya sosyolojisini de içine alan, iletişimin her türü ile ilgilenen geniş bir disiplindir.", "C) Medya sosyolojisinin çalışma alanı konvansiyonel medya ile sınırlıdır.", "D) Bireyler arası iletişim her iki iletişim türünün de ilgi alanındadır.", "E) Teknolojik cihazlar ile kurulan iletişim sadece medya sosyolojisinin alanına girer."],
+                ans: "B) İletişim sosyolojisi, medya sosyolojisini de içine alan, iletişimin her türü ile ilgilenen geniş bir disiplindir.",
+                exp: "İletişim sosyolojisi ve medya sosyolojisi birbiriyle yakın ilişkili olmakla birlikte aynı anlama gelmez; biri genel iletişim-toplum ilişkisine, diğeri özellikle medya kurumlarına odaklanır.",
+                exams: ["24-25 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi liberal/ana akım iletişim modellerinden biri olan 'medya etkileri odaklı' yaklaşımlardan biri değildir?",
+                options: ["A) Kamuoyu oluşturma", "B) Çerçeveleme", "C) Ekonomi politik", "D) Suskunluk sarmalı", "E) Gündem belirleme"],
+                ans: "C) Ekonomi politik",
+                exp: "Medya etkileri odaklı (liberal/ana akım) yaklaşım, medyanın izleyici talepleri doğrultusunda içerik ürettiğini ve toplumsal ihtiyaçlara cevap verdiğini savunur.",
+                exams: ["24-25 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Kamuoyunun yeterince dikkatini çekmemiş bir konuyu gündeme getirmek için 'zorlama' ve 'ikna' olmak üzere iki farklı yöntem bulunmaktadır. Buna göre aşağıdaki örneklerden hangisi ikna yolu ile kamuoyu oluşturma sayılabilir?",
+                options: ["A) Bir grubun dikkat çekmek için kendilerini meclis kapısına zincirlemesi", "B) Açlık grevi yapılması", "C) Ana yollardan birinin trafiğe kapatılması", "D) Kamu hizmetlerini engelleyerek kamuoyunun dikkatinin çekilmesi", "E) Gazetelere ilan verilmesi veya haber yapılması"],
+                ans: "E) Gazetelere ilan verilmesi veya haber yapılması",
+                exp: "Gündem belirleme kuramı, medyanın izleyiciye 'ne düşüneceğini' değil 'ne hakkında düşüneceğini' dikte ederek kamuoyunun ilgi odaklarını şekillendirdiğini öne sürer.",
+                exams: ["24-25 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi toplumsallaşma aracısı olarak medyanın üstlendiği rollerden biri değildir?",
+                options: ["A) Değer yargılarının oluşmasında önemli bir rol üstlenmesi", "B) Ticari ve kültürel ürünlerin pazarlanmasında önemli bir araç olması", "C) Haber, dizi, çizgi film gibi içeriklerin izleyiciler açısından yönlendirici olması", "D) Algılama, kavrama ve yorumlama açısından yönlendirici olması", "E) Belli olaylar karşısında nasıl davranılması gerektiğine ilişkin bazı roller sunması"],
+                ans: "B) Ticari ve kültürel ürünlerin pazarlanmasında önemli bir araç olması",
+                exp: "Toplumsallaşma aracısı olarak medya; değerleri aktarır, eğitim verir, eğlendirir ve sosyal kontrol işlevi görür; bireyin kariyer seçimini yönlendirmek ise medyanın temel rolü değildir.",
+                exams: ["24-25 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "UNESCO adına 1977 yılında uluslararası medya sorunlarını analiz etmek üzere bir rapor hazırlayan İletişim Sorunlarını İnceleme Komisyonunun kısa adı aşağıdakilerden hangisidir?",
+                options: ["A) McQuail Komisyonu", "B) Küresel Etik Komisyonu", "C) McBride Komisyonu", "D) UNESCO Komisyonu", "E) BM Medya Komisyonu"],
+                ans: "C) McBride Komisyonu",
+                exp: "Sean MacBride, UNESCO bünyesinde kurulan İletişim Sorunları Uluslararası Komisyonu'nun başkanı olarak 1980'de sunulan ve uluslararası bilgi dengesizliğini eleştiren raporu hazırlamıştır.",
+                exams: ["24-25 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi bir teknolojik araç aracılığı ile gerçekleşen kitle iletişiminin özelliklerinden biri değildir?",
+                options: ["A) Kaynak tarafından bilinen ve tanınan bir hedef kitlesi vardır.", "B) Yayınlar veya mesajlar belge niteliği taşır.", "C) Geri besleme (feedback) imkânı çok sınırlıdır.", "D) Kamusaldır yani içeriği herkese açıktır.", "E) Yayınlar veya mesajlar saklanabilir ve tekrar ulaşılabilir."],
+                ans: "A) Kaynak tarafından bilinen ve tanınan bir hedef kitlesi vardır.",
+                exp: "Kitle iletişiminin özellikleri arasında geniş kitlelere ulaşma, tek yönlü mesaj akışı ve büyük organizasyon gerektirme sayılır; anlık geri bildirim ve diyalog ise kişiler arası iletişimin özelliğidir.",
+                exams: ["24-25 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Georg Simmel'e göre bilim dalı olarak sosyolojinin ilgi alanına giren tek özel alan aşağıdakilerden hangisidir?",
+                options: ["A) İletişim sosyolojisi", "B) Medyatikleşme", "C) Toplumsallaşma", "D) Kurumsallaşma", "E) Sanayileşme"],
+                ans: "C) Toplumsallaşma",
+                exp: "Georg Simmel, sosyolojinin özgün ilgi alanının toplumsal kurumlar ya da yapılar değil, bireyler arası etkileşim biçimleri yani toplumsal ilişkiler olduğunu savunmuştur.",
+                exams: ["24-25 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Kamuoyunun toplumsal işlevlerini; uyum, gevşeme ve şiddet yoluna başvurma biçiminde üç temel biçimde yerine getirdiğini savunan düşünür aşağıdakilerden hangisidir?",
+                options: ["A) Harold D. Lasswell", "B) Arnold Toynbee", "C) Saint Simon", "D) Niklas Luhmann", "E) Noelle-Neumann"],
+                ans: "D) Niklas Luhmann",
+                exp: "Davison, kamuoyunun üstlendiği toplumsal işlevleri uyum sağlama, toplumsal gerilimi azaltma (gevşeme) ve şiddete yönelme olmak üzere üç temel biçimde sınıflandırmıştır.",
+                exams: ["24-25 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Tüm bilim alanları için 'iletişimin bir araç olması' ne anlama gelmektedir?",
+                options: ["A) İnsanlar arası ilişkinin temel aracısı iletişimdir.", "B) İletişim araçlarını tüm bilim dallarının kullanmak zorundadır.", "C) Araç insanın uzantısıdır.", "D) Bilim insanları araçları kullanarak bilimsel araştırma yapabilirler.", "E) İletişim, gelişmek, yaygınlaşmak ve öğretilebilmek için tüm bilim alanlarının kullanmak zorunda olduğu bir araçtır."],
+                ans: "E) İletişim, gelişmek, yaygınlaşmak ve öğretilebilmek için tüm bilim alanlarının kullanmak zorunda olduğu bir araçtır.",
+                exp: "Tüm bilim dallarında iletişim bir araçtır; araştırmacılar bulgu, yöntem ve teorilerini iletişim yoluyla (yayın, sunum, tartışma) aktarır ve bilim topluluğu bu bilgiyi paylaşarak ilerler.",
+                exams: ["24-25 Vize", "1 Kez Çıktı!"]
+            },
+            {
+                q: "Aşağıdakilerden hangisi 1980'lerden sonra, medya sektörünü de kapsayan, küreselleşme ve neo liberal politikaların sonuçlarından biri olarak gösterilemez?",
+                options: ["A) Ulus devletlerin sınırlarının zayıflaması", "B) Uluslararası sermaye hareketlerinin yaygınlaşması", "C) Gümrük duvarlarının kalkmaya başlaması", "D) Küresel şirketlerin tüm dünyayı alternatif pazarlara dönüşmesi", "E) Sosyalist ekonomi modelinin yaygınlaşması"],
+                ans: "E) Sosyalist ekonomi modelinin yaygınlaşması",
+                exp: "1980'lerden itibaren neo-liberal politikaların etkisiyle medya sektöründe özelleştirme, serbestleşme ve tekelleşme yaşanmış; uluslararası medya şirketleri güçlenmiştir. Sosyal medya ise ancak 2000'lerin başında ortaya çıkmıştır.",
+                exams: ["24-25 Vize", "1 Kez Çıktı!"]
+            }
+        ];
+
+        let allAnswersVisible = false;
+
+        function renderQuestions(filter) {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+
+            const filtered = filter === 'all'
+                ? sorular
+                : filter === 'banko'
+                ? sorular.filter(s => s.exams.filter(e => !e.includes('Kez')).length >= 2)
+                : sorular.filter(s => s.exams.some(e => e.includes(filter)));
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<p style="text-align:center;color:#636e72;font-size:1.1em;">Bu kategoride soru bulunamadı.</p>';
+                return;
+            }
+
+            filtered.forEach((soru, idx) => {
+                const card = document.createElement('div');
+                card.className = 'question-card';
+
+                const tagsHTML = soru.exams.map(e => {
+                    const isFreq = e.includes('Kez Çıktı');
+                    let cls = 'exam-tag';
+                    if (isFreq)             cls += ' freq-tag';
+                    else if (e.includes('Vize'))  cls += ' vize-tag';
+                    else if (e.includes('Final')) cls += ' final-tag';
+                    else if (e.includes('Büt'))   cls += ' but-tag';
+                    return `<span class="${cls}">${e}</span>`;
+                }).join('');
+
+                const optionsHTML = soru.options.map(o => `<li>${o}</li>`).join('');
+                const answerId = `answer-${idx}-${filter}`;
+
+                card.innerHTML = `
+                    <div class="q-header">
+                        <strong style="color:var(--secondary);font-size:0.95em;">Soru ${idx + 1}</strong>
+                        <div class="exam-tags">${tagsHTML}</div>
+                    </div>
+                    <p class="question-text">${soru.q}</p>
+                    <ul class="options">${optionsHTML}</ul>
+                    <button class="btn-toggle" onclick="toggleAnswer('${answerId}', this)">Cevabı Göster</button>
+                    <div class="answer-area" id="${answerId}" style="${allAnswersVisible ? 'display:block' : ''}">
+                        <p class="correct-ans">✔ Doğru Cevap: ${soru.ans}</p>
+                        <p class="exp-text">${soru.exp}</p>
+                    </div>
+                `;
+
+                if (allAnswersVisible) {
+                    card.querySelector('.btn-toggle').textContent = 'Cevabı Gizle';
+                }
+
+                container.appendChild(card);
+            });
+        }
+
+        function toggleAnswer(id, btn) {
+            const area = document.getElementById(id);
+            if (area.style.display === 'none' || area.style.display === '') {
+                area.style.display = 'block';
+                btn.textContent = 'Cevabı Gizle';
+            } else {
+                area.style.display = 'none';
+                btn.textContent = 'Cevabı Göster';
+            }
+        }
+
+        function toggleAllAnswers() {
+            allAnswersVisible = !allAnswersVisible;
+            document.getElementById('globalToggleBtn').textContent =
+                allAnswersVisible ? 'Tüm Cevapları Gizle' : 'Tüm Cevapları Göster';
+            document.querySelectorAll('.answer-area').forEach(area => {
+                area.style.display = allAnswersVisible ? 'block' : 'none';
+            });
+            document.querySelectorAll('.btn-toggle').forEach(btn => {
+                btn.textContent = allAnswersVisible ? 'Cevabı Gizle' : 'Cevabı Göster';
+            });
+        }
+
+        function filterQuestions(filter, clickedBtn) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            clickedBtn.classList.add('active');
+            allAnswersVisible = false;
+            document.getElementById('globalToggleBtn').textContent = 'Tüm Cevapları Göster';
+            renderQuestions(filter);
+        }
+
+        renderQuestions('all');
+    </script>
+</body>
+</html>

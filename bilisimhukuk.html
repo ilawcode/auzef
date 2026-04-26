@@ -1,0 +1,759 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AUZEF Bilişim Hukuku - Mega Soru Bankası</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #0984e3;
+            --success: #00b894;
+            --warning: #f39c12;
+            --bg: #f4f6f8;
+            --card-bg: #ffffff;
+            --text: #2d3436;
+            --border: #dfe6e9;
+            --global-btn: #e17055;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container { max-width: 1000px; margin: 0 auto; }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 30px 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .header h1 { margin: 0 0 10px 0; font-size: 2.2em; }
+        .header p { margin: 0; font-size: 1.1em; color: #bdc3c7; }
+
+        .controls-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+            background: var(--bg);
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .tabs { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+
+        .tab-btn {
+            background-color: #ecf0f1;
+            color: var(--primary);
+            border: 2px solid var(--border);
+            padding: 10px 20px;
+            font-size: 1.05em;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover { background-color: #dfe6e9; }
+        .tab-btn.active { background-color: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 4px 10px rgba(9, 132, 227, 0.3); }
+
+        .global-toggle-btn {
+            background-color: var(--global-btn);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(225, 112, 85, 0.3);
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .global-toggle-btn:hover { background-color: #d63031; transform: translateY(-2px); }
+
+        #quiz-container { display: flex; flex-direction: column; gap: 20px; animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .question-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 25px;
+            border-left: 6px solid var(--accent);
+        }
+
+        .q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .exam-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+        .exam-tag { background-color: #ffeaa7; color: #d63031; padding: 4px 10px; border-radius: 5px; font-size: 0.85em; font-weight: bold; }
+        .exam-tag.freq-tag { background-color: #e17055; color: white; }
+
+        .question-text { font-size: 1.15em; font-weight: 600; color: var(--primary); margin-top: 0; margin-bottom: 15px; white-space: pre-wrap; }
+        .options { list-style: none; padding: 0; margin: 0 0 20px 0; display: flex; flex-direction: column; gap: 8px; }
+        .options li { background-color: #f8f9fa; padding: 10px 15px; border-radius: 8px; border: 1px solid var(--border); font-size: 1em; }
+
+        .btn-toggle { background-color: var(--secondary); color: white; border: none; padding: 10px; width: 100%; font-size: 1.05em; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        .btn-toggle:hover { background-color: var(--primary); }
+
+        .answer-area { display: none; margin-top: 15px; padding: 15px; background-color: #eafaf1; border-left: 5px solid var(--success); border-radius: 0 8px 8px 0; }
+        .correct-ans { font-size: 1.1em; color: var(--success); margin: 0 0 8px 0; font-weight: bold; }
+        .exp-text { margin: 0; color: var(--text); line-height: 1.5; font-size: 0.95em; }
+        
+        .warning-text { color: #d35400; font-weight: bold; background-color: #fcf3cf; padding: 5px; border-radius: 4px; display: inline-block; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Bilişim Hukuku Mega Havuz</h1>
+            <p>Vize + Final + Bütünleme (Tam Kapsamlı - Hata Filtreli)</p>
+        </div>
+
+        <div class="controls-container">
+            <button id="globalToggleBtn" class="global-toggle-btn" onclick="toggleAllAnswers()">Tüm Cevapları Göster</button>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="filterQuestions('all', this)">Tüm Havuz</button>
+                <button class="tab-btn" onclick="filterQuestions('Vize', this)">Vize Soruları</button>
+                <button class="tab-btn" onclick="filterQuestions('Final', this)">Final Soruları</button>
+                <button class="tab-btn" onclick="filterQuestions('Bütünleme', this)">Büt. Soruları</button>
+                <button class="tab-btn" style="background-color: #ffeaa7; color: #d63031;" onclick="filterQuestions('Kez Çıktı', this)">🔥 Banko Sorular</button>
+                <button class="tab-btn" style="background-color: #fcf3cf; color: #d35400; border-color: #d35400;" onclick="filterQuestions('Dikkat', this)">⚠️ Dikkat Edilmesi Gerekenler</button>
+            </div>
+        </div>
+
+        <div id="quiz-container"></div>
+    </div>
+
+    <script>
+        const sorular = [
+            { 
+                q: "5651 Sayılı Kanunda (kısaca İnternet Kanununda) yer alan, 'İnternet ortamı üzerinden kullanıcılara sunulan her türlü bilgi veya veriyi üreten, değiştiren ve sağlayan gerçek veya tüzel kişi' şeklindeki cümle aşağıdakilerden hangisini tanımlamaktadır?", 
+                options: ["A) Yer sağlayıcı", "B) Erişim sağlayıcı", "C) İçerik sağlayıcı", "D) Aracı hizmet sağlayıcı", "E) Toplu kullanım sağlayıcı"], 
+                ans: "C) İçerik sağlayıcı", 
+                exp: "Kanunun 2. maddesinde yer alan yasal tanımdır. İnternette okuduğunuz bir metni yazan, izlediğiniz bir videoyu çeken veya bir fotoğrafı yükleyen kişi 'İçerik Sağlayıcı'dır.", 
+                exams: ["Vize", "Bütünleme", "5 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi TCK'da 'bilişim alanındaki suçlar' başlığı altında düzenlenen suçlardandır?", 
+                options: ["A) Banka veya kredi kartlarının kötüye kullanılması suçu", "B) Bir kişinin evine gizlice kamera yerleştirilip kişinin izlenmesi", "C) Bir mağazadan bilgisayar ve bilgisayar programı çalmak", "D) Kaçakçılık yapmak için internet üzerinden haberleşmek", "E) Banka soymak için internetten silah satın almak"], 
+                ans: "A) Banka veya kredi kartlarının kötüye kullanılması suçu", 
+                exp: "TCK m. 245'te yer alan 'Banka veya kredi kartlarının kötüye kullanılması suçu' doğrudan bilişim suçudur. Diğerleri özel hayatın ihlali, hırsızlık veya kaçakçılıktır.", 
+                exams: ["Final", "Bütünleme", "5 Kez Çıktı!"] 
+            },
+            { 
+                q: "Hukukumuzdaki alan adı sistemi açısından aşağıdakilerden hangisi yanlıştır?", 
+                options: ["A) Alan adlarına dair sistem güncel olarak TRABİS tarafından işletilmektedir.", "B) Alan adları aynı zamanda önemli birer tanıtım aracı haline gelmişlerdir.", "C) www.istanbul.edu.tr alan adındaki .tr ibaresi üst düzey alan adı olup jenerik üst düzey alan adını ifade etmektedir.", "D) IP adresi ve alan adı eşleşmesini çok kısa sürede yapar.", "E) Temel hususların ayrıntıları Alan Adları Yönetmeliğinde düzenlenmiştir."], 
+                ans: "C) www.istanbul.edu.tr alan adındaki .tr ibaresi üst düzey alan adı olup jenerik üst düzey alan adını ifade etmektedir.", 
+                exp: "'.tr' (Türkiye) jenerik değil, 'Ülke Kodlu Üst Düzey Alan Adı'dır (ccTLD). Jenerik olanlar (gTLD) .com, .org gibi coğrafi sınır taşımayanlardır.", 
+                exams: ["Vize", "Final", "Bütünleme", "4 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi Sınai Mülkiyet Kanunu kapsamında doğrudan korunan konulardan değildir?", 
+                options: ["A) Faydalı modeller", "B) Coğrafi işaretler", "C) Telif hakları", "D) Buluşlar", "E) Geleneksel ürün adları"], 
+                ans: "C) Telif hakları", 
+                exp: "<span class='warning-text'>⚠️ DİKKAT:</span> Şiir, müzik, tablo veya bilgisayar yazılımı gibi eserler 'Telif Hakları' şemsiyesinde 5846 Sayılı Fikir ve Sanat Eserleri Kanunu (FSEK) ile korunur. Sınai Mülkiyet Kanunu (SMK) kapsamında değildir.", 
+                exams: ["Vize", "Final", "Bütünleme", "3 Kez Çıktı!", "⚠️ Dikkat!"] 
+            },
+            { 
+                q: "Bilgisayar programlarında eser sahipliği açısından aşağıdakilerden hangisi yanlıştır?", 
+                options: ["A) Bir programcı bir programı tek başına yazarsa eser sahibi odur.", "B) Bir bilgisayar programcısının sekreteri de program üzerinde birlikte eser sahibi olarak hak sahibi olur, çünkü sekreterlik görevi yaparak yardım etmiştir.", "C) Birden fazla programcı birlikte yazmış ise birlikte eser sahibi sayılırlar.", "D) İşveren kanun gereği hakları kullanma yetkisine sahiptir.", "E) Ayrılmaz bir bütün teşkil ediyorsa, program üzerindeki hakları bir araya getiren kişi tarafından kullanılır."], 
+                ans: "B) Bir bilgisayar programcısının sekreteri de program üzerinde birlikte eser sahibi olarak hak sahibi olur...", 
+                exp: "Eser sahibi olmak için o ürünün yazılımına veya mimarisine (fikri yaratım sürecine) katkıda bulunmak gerekir. Sekreterlik gibi idari destek faaliyetleri eser sahipliği hakkı doğurmaz.", 
+                exams: ["Vize", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi bir bilgisayar programının FSEK kapsamında korunan unsurlarından değildir?", 
+                options: ["A) Programın temelinde yatan ilkeler", "B) Kaynak kodu", "C) Nesne kodu", "D) Hazırlık tasarımı", "E) Programın akış planı (akış diyagramı)"], 
+                ans: "A) Programın temelinde yatan ilkeler", 
+                exp: "<span class='warning-text'>⚠️ DİKKAT:</span> Telif hukuku soyut fikirleri, algoritmaları veya matematiksel kuralları (ilkeleri) korumaz, o fikrin somutlaşmış halini (ifadeyi - kodları ve tasarımları) korur.", 
+                exams: ["Vize", "Bütünleme", "3 Kez Çıktı!", "⚠️ Dikkat!"] 
+            },
+            { 
+                q: "Hukuki işleme dair aşağıdaki bilgilerden hangisi yanlıştır?", 
+                options: ["A) Hukuki işlemlerin en temel görünümü sözleşmelerdir", "B) Hukukumuzda hukuki işlemler iki taraflı olduklarında şekle bağlıdırlar", "C) Hukuki işlemin temel unsuru, hukuki sonuç doğurmaya yönelik irade açıklamasıdır", "D) Hukuki işlemlere dair temel unsurlar bilişim hukuku için de geçerlidir", "E) Genel işlem koşulu şeklinde olması mümkündür"], 
+                ans: "B) Hukukumuzda hukuki işlemler iki taraflı olduklarında şekle bağlıdırlar", 
+                exp: "Türk Borçlar Kanunu'nda temel prensip 'Şekil Serbestisi'dir. İki taraflı işlemler (sözleşmeler) kural olarak özel bir şekle (yazılı, noter vs.) bağlı olmadan, sözlü veya internet üzerinden de kurulabilir.", 
+                exams: ["Final", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "Bilişim hukuku hakkında aşağıda verilen bilgilerden hangisi yanlıştır?", 
+                options: ["A) Elektronik ortamda işlenen suçlara dair hukuki rejim veya elektronik alandaki ticari faaliyetlerin vergilendirilmesi gibi hususlar, tamamen ayrı hukuk alanlarının kapsamında kalan konular olduklarından, bilişim hukukunun kapsamına dahil değildirler.", "B) E-ticaret, alan adları, kişisel verilerin elektronik ortamda korunması gibi hususlar bilişim hukukunun kapsamında kalan konulardır.", "C) Bilişim hukuku hem özel ve hem de kamu hukukuna dahil edilebilecek yönler içermektedir.", "D) Bilişim hukuku aynı zamanda bir maddi hukuktur.", "E) Bilişim hukuku şekli hukuk kapsamında da görülebilir."], 
+                ans: "A) Elektronik ortamda işlenen suçlara dair hukuki rejim veya elektronik alandaki ticari faaliyetlerin vergilendirilmesi... bilişim hukukunun kapsamına dahil değildirler.", 
+                exp: "Siber suçlar (Ceza) ve dijital vergiler (Vergi) bilişim hukukunun en önemli disiplinlerarası çalışma alanlarıdır. Kapsam dışı değildirler.", 
+                exams: ["Vize", "Final", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "Tüketicilerin Korunması Hakkındaki Kanun'da (TKHK'da) düzenlenen mesafeli sözleşmelerin ifası açısından aşağıdakilerden hangisi yanlıştır?", 
+                options: ["A) Bu sözleşmelerde kanunda öngörülen süreler içinde edim ifa edilmediğinde, tüketici, ancak diğer tarafa 14 günlük bir ek süre verdikten sonra sözleşmeyi sonlandırabilir.", "B) Satıcı edimini yerine getirmemesi durumunda tüketici sözleşmeyi feshedebilir.", "C) Satıcı taahhüt edilen süre içinde edimini yerine getirmelidir.", "D) İmkansızlaşması halinde 3 gün içinde bildirim zorunludur.", "E) Mal satışlarında sözleşmenin ifa süresi her halükarda 30 günü geçemez."], 
+                ans: "A) Bu sözleşmelerde kanunda öngörülen süreler içinde edim ifa edilmediğinde, tüketici, ancak diğer tarafa 14 günlük bir ek süre verdikten sonra sözleşmeyi sonlandırabilir.", 
+                exp: "İnternetten alınan ürün süresinde teslim edilmezse, tüketici sözleşmeyi derhal feshetme hakkına sahiptir. Ek mühlet/süre verme zorunluluğu yoktur.", 
+                exams: ["Final", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi bir link verme türü değildir?", 
+                options: ["A) İç link (inpagelink)", "B) Embedding (gömülü) link", "C) Frame (çerçeve) link", "D) Çatı link", "E) Derin link"], 
+                ans: "D) Çatı link", 
+                exp: "İnternet hukukunda iç link, derin link, frame ve gömülü (embedding) link tanımları vardır. 'Çatı link' diye teknik bir terim bulunmamaktadır.", 
+                exams: ["Vize", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "Normlar hiyerarşisinin anlamı aşağıdakilerden hangisinde doğru açıklanmıştır?", 
+                options: ["A) Devletteki en yetkili kişinin en üstün kuralları koyacağı anlamına gelir.", "B) Genel kanunların özel kanunların üstünde olduğunu ifade eden temel ilkedir.", "C) İdarenin temel hak ve özgürlükleri sınırlayan kararlarının kanuni temeli olması gerektiğini ifade eder.", "D) Kuvvetler ayrılığı ilkesinin bir diğer ifadesidir.", "E) Hukuk kurallarının birbiriyle olan ilişkisine dair temel bir ilkedir ve Anayasa'nın en üst hukuk kaynağı olduğunu, diğer kuralların aşağıya doğru konumlandığı yapıyı ifade eder."], 
+                ans: "E) Hukuk kurallarının birbiriyle olan ilişkisine dair temel bir ilkedir ve Anayasa'nın en üst hukuk kaynağı olduğunu...", 
+                exp: "Hukuk kurallarının alt-üst ilişkisidir (Kelsen Piramidi). Hiçbir yönetmelik kanuna, hiçbir kanun Anayasaya aykırı olamaz. En güçlü ve en üstün kural her zaman Anayasadır.", 
+                exams: ["Vize", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi bilişim hukuku alanındaki temel kanunlarda düzenlenen süjelerden değildir?", 
+                options: ["A) Elektronik ticaret aracı hizmet sağlayıcı", "B) İçerik sağlayıcı", "C) Yer sağlayıcı", "D) Toplu kullanım sağlayıcı", "E) Erişim geliştirmeyi sağlayıcı"], 
+                ans: "E) Erişim geliştirmeyi sağlayıcı", 
+                exp: "Kanunlarda 'Erişim Sağlayıcı' (TTNET, Turkcell vb.) şeklinde resmi bir tanım vardır ancak 'Erişim Geliştirmeyi Sağlayıcı' isminde bir kavram veya aktör mevzuatta bulunmamaktadır.", 
+                exams: ["Vize", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "Tüketicilerin Korunması Hakkındaki Kanun'da (TKHK) mesafeli sözleşmeler itibariyle tüketiciye tanınan ve tüketicinin herhangi bir gerekçe göstermeksizin ve cezai şart ödemeksizin kullanabileceği hak aşağıdakilerden hangisidir?", 
+                options: ["A) Sözleşmeyi dönüştürme hakkı", "B) Cayma hakkı", "C) Geri alım hakkı", "D) Caydırma hakkı", "E) Ön bilgilendirme isteme hakkı"], 
+                ans: "B) Cayma hakkı", 
+                exp: "İnternetten (mesafeli) yapılan alışverişlerde tüketicinin, malı teslim aldıktan sonraki 14 gün içinde hiçbir mazeret/gerekçe belirtmeden ve ceza ödemeden ürünü iade edip parasını geri alma hakkına 'Cayma Hakkı' denir.", 
+                exams: ["Final", "Bütünleme", "2 Kez Çıktı!"] 
+            },
+            { 
+                q: "Kişisel verilerin işlenmesi süreci açısından, bu sürecin, verisi işlenen kişi penceresinden açık/belirli olmasını, sürece dair bilgilenme imkânı verilmesini ifade eden ilke aşağıdakilerden hangisidir?", 
+                options: ["A) Güvenilirlik ve gizlilik ilkesi", "B) Amaca bağlılık ilkesi", "C) Şeffaflık ilkesi", "D) Hukuka ve dürüstlük kuralına uygunluk ilkesi", "E) Verilerin güncel olması ilkesi"], 
+                ans: "C) Şeffaflık ilkesi", 
+                exp: "Veri işleme süreçlerinin veri sahibi kişi için açık, bilinir ve anlaşılır olmasını; neyin kim tarafından işlendiğinin gizlenmemesini sağlayan KVKK evrensel ilkesi 'Şeffaflık İlkesi'dir.", 
+                exams: ["Final", "Bütünleme", "2 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi eser sahibinin mali veya manevi haklarından değildir?", 
+                options: ["A) Çoğaltma hakkı", "B) Umuma arz yetkisi", "C) Takip hakkı", "D) Umumu yönlendirme hakkı", "E) Yayma hakkı"], 
+                ans: "D) Umumu yönlendirme hakkı", 
+                exp: "Hukuk terminolojisinde 'Umumu yönlendirme hakkı' şeklinde tanımlanmış bir eser sahibi hakkı yoktur; tamamen uydurma bir şıktır. Yayma ve Çoğaltma mali, Umuma Arz manevidir.", 
+                exams: ["Vize", "Bütünleme", "2 Kez Çıktı!"] 
+            },
+            { 
+                q: "Alan adı sistemi açısından aşağıdakilerden hangisi yanlıştır?", 
+                options: ["A) Alan adı sisteminde en üst düzey alan adları sadece ülke kodlarından ibaret değildir.", "B) IP adresi ve alan adı eşleşmesini her iki yönde yapabilir.", "C) IP adreslerinin aksine akılda tutulma kolaylığı sağlar.", "D) Hukukumuzda güncel alan adı sistemini Alan Adı Kanununu bütün ayrıntılarıyla düzenlemektedir.", "E) Birden fazla alan adı aynı IP adresine yönlendirilebilir."], 
+                ans: "D) Hukukumuzda güncel alan adı sistemini Alan Adı Kanununu bütün ayrıntılarıyla düzenlemektedir.", 
+                exp: "Türk hukukunda sırf alan adlarını düzenleyen müstakil bir 'Alan Adı Kanunu' bulunmamaktadır. İşlemler 5651 sayılı kanun ve yönetmeliklerle yürütülür.", 
+                exams: ["Vize", "Bütünleme", "2 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi, alan adının tahsisi hakkında yürütülen ve alan adının kime verilmesinin daha doğru olacağı yönündeki tartışmanın maddi temelini oluşturur?", 
+                options: ["A) IP adreslerinin akılda tutulması zorluğu.", "B) IP adreslerini kimin vereceği sorunu.", "C) İlk gelen alır kuralıyla bütün sorunların toptan çözülmesi.", "D) Alan adının tekliği ve buna temel olabilecek hukuki pozisyonların ise duruma göre çok sayıda olması ve bunların farklı hukuki temellere dayanabilmesi.", "E) Türkiye'de alan adı sisteminin merkezi hale getirilmesi."], 
+                ans: "D) Alan adının tekliği ve buna temel olabilecek hukuki pozisyonların çok sayıda olması...", 
+                exp: "İnternette adres (örneğin mars.com) tek iken, gerçek dünyada bu ismi kullanmaya meşru hakkı olan marka, kişi veya eser adlarının (çok sayıda hak sahibinin) olması tartışmanın temelidir.", 
+                exams: ["Vize", "Bütünleme", "2 Kez Çıktı!"] 
+            },
+            { 
+                q: "İnternetteki temel süjeler ve/veya bunların sorumluluğu açısından aşağıdakilerden hangisi doğrudur?", 
+                options: ["A) TTNet, Superonline içerik sağlayıcı sayılırlar.", "B) Sadece kendi resimlerini yayınlayan kişi içerik sağlayıcı sayılmaz.", "C) Arama motorları erişim sağlayıcı sayılırlar.", "D) Yer sağlayıcı sadece gerçek kişileri ifade eder.", "E) İçerik sağlayıcının sorumluluğu itibariyle, kendi içeriği ile başkasına ait içeriğe verdiği bağlantı arasında kanunda ayrım yapılmış ve bunlar farklı kurallara bağlanmıştır."], 
+                ans: "E) İçerik sağlayıcının sorumluluğu itibariyle, kendi içeriği ile başkasına ait içeriğe verdiği bağlantı arasında kanunda ayrım yapılmış...", 
+                exp: "Kanuna göre içerik sağlayıcı kendi ürettiğinden bizzat sorumludur. Ancak başkasına verdiği linkten (benimsemediği sürece) kural olarak sorumlu tutulmaz. Ayrım yapılmıştır.", 
+                exams: ["Vize", "Bütünleme", "2 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi fikri mülkiyet hukuku alanı değildir?", 
+                options: ["A) Marka hukuku", "B) Fikir ve sanat eserleri hukuku", "C) Faydalı bilgiler hukuku", "D) Tasarım hukuku", "E) Ürün adları ve coğrafik işaretlerin korunması"], 
+                ans: "C) Faydalı bilgiler hukuku", 
+                exp: "Sınai Mülkiyet Kanunu'nda (SMK) 'Faydalı Model' vardır ancak hukuk sistemimizde 'Faydalı bilgiler hukuku' diye bir alan yoktur.", 
+                exams: ["Vize", "Bütünleme", "2 Kez Çıktı!"] 
+            },
+            { 
+                q: "Cemile isimli romanın yazarı ile adı Cemile olan bir kişi arasındaki www.cemile.com.tr alan adı uyuşmazlığı açısından aşağıdakilerden hangisi doğrudur?", 
+                options: ["A) Eserin yazılma tarihi doğum tarihinden önce ise eser sahibi almalıdır.", "B) Bu tür bir uyuşmazlıkta herkesin kendine uygun bir hukuki pozisyonu bulunduğundan, kimin alan adını önce kaydettirdiğine bakmak gerekir.", "C) Eser koruması isim korumasından önce geldiğinden yazar almalıdır.", "D) Cemile ismi bayan adı olduğundan öncelik sağlar.", "E) Eser sahibinin toplumsal kültüre katkısından dolayı öncelik hakkı vardır."], 
+                ans: "B) Bu tür bir uyuşmazlıkta herkesin kendine uygun bir hukuki pozisyonu bulunduğundan... kimin önce kaydettirdiğine bakmak gerekir.", 
+                exp: "İki taraf da kötü niyetli değilse ve ikisinin de ismi kullanmak için geçerli sebebi varsa 'İlk gelen alır' kuralı işletilir. İsim hakkı ile eser adı arasında mutlak bir üstünlük yoktur.", 
+                exams: ["Vize", "Bütünleme", "2 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi belgeli alan adı örneğidir?", 
+                options: ["A) .name.tr", "B) .biz.tr", "C) .com.tr", "D) .dr.tr", "E) .net.tr"], 
+                ans: "D) .dr.tr", 
+                exp: "Mesleki suiistimali önlemek için 'dr.tr' (doktor) ve 'av.tr' (avukat) gibi alan adları sadece resmi belge (diploma/kimlik) ibrazıyla alınabilir. Diğerleri belgesizdir.", 
+                exams: ["Vize", "Bütünleme", "2 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi SMK m. 7 III hükmü açısından yanlıştır?", 
+                options: ["A) Ortada hukuken korunan bir markanın bulunması gerekir.", "B) İşaretin alan adı olarak internette kullanılmasının ticari olup olmaması önemsizdir.", "C) Markayla örtüşen ibarenin alan adı olarak kullanılması gerekir.", "D) Alan adı kullananın üstün bir hakka sahip olmaması gerekir.", "E) Marka hukukuna ilişkin bir sorunu düzenler."], 
+                ans: "B) SMK m. 7 III hükmü açısından işaretin alan adı olarak internette kullanılmasının ticari olup olmaması önemsizdir.", 
+                exp: "Markanın izinsiz kullanımına müdahale edilebilmesi için kullanımın mutlaka 'ticari etki' yaratması şarttır. Bu yüzden 'önemsizdir' ifadesi yanlıştır.", 
+                exams: ["Vize", "Bütünleme", "2 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi bir ürünün Fikir ve Sanat Eserleri Hukuku anlamında eser sayılması için gerekli koşullardan biridir?", 
+                options: ["A) Eserin yeni olması zorunluluğu", "B) Eserin multimedya eseri olması zorunluluğu", "C) Eserin cismaniyet kazanması zorunluluğu", "D) Eserin yaratıcısının hususiyetini taşıması zorunluluğu", "E) Eserin dijital olması zorunluluğu"], 
+                ans: "D) Eserin yaratıcısının hususiyetini taşıması zorunluluğu", 
+                exp: "FSEK kapsamında bir ürünün eser sayılabilmesi için sahibinin kişiliğini, seçimlerini ve yaratıcılığını (hususiyetini) yansıtması temel şarttır.", 
+                exams: ["Vize", "Bütünleme", "2 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi İnternet Kanununda (5651) tanımlanan hususlardan değildir?", 
+                options: ["A) Elektronik ticaret aracı hizmet sağlayıcı", "B) Yer sağlayıcı", "C) Toplu kullanım sağlayıcı", "D) Sosyal ağ sağlayıcı", "E) Erişim sağlayıcı"], 
+                ans: "A) Elektronik ticaret aracı hizmet sağlayıcı", 
+                exp: "E-ticaret aracı hizmet sağlayıcı (Pazaryerleri vb.) tanımı 5651 sayılı İnternet Kanununda değil, 6563 Sayılı Elektronik Ticaret Kanunu'nda yer alır.", 
+                exams: ["Vize", "Bütünleme", "2 Kez Çıktı!"] 
+            },
+            { 
+                q: "Hukukumuz açısından, hukukun diğer toplumsal düzen kurumlarından farklılığına dair aşağıdaki ibarelerden hangisi doğrudur?", 
+                options: ["A) Hukuk kuralları her zaman ahlak kuralları ile birebir örtüşürler.", "B) Hukuk asıl ve ağırlıklı olarak dini kurallara bağlıdır.", "C) Hukuk kurallarında yaptırımlar devlet gücü ile desteklenmektedir.", "D) Bütün hukuk kuralları her zaman yazılıdır.", "E) Hukuk kuralları kural olarak değiştirilemezler."], 
+                ans: "C) Hukuk kurallarında yaptırımlar devlet gücü ile desteklenmektedir.", 
+                exp: "Din ve ahlak kuralları manevi (ayıplanma vb.) yaptırımlar içerirken, hukuk kurallarının arkasında devletin zorlayıcı maddi gücü (polis, icra, mahkeme) vardır.", 
+                exams: ["Vize", "Final", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "A'nın kurduğu ve deprem konusunda bilimsel yayınlar yapan www.depremhaberleri.com.tr dergisi 2012'den beri faaliyettedir. B ise 'deprem ve bilim' dergisini kurup 2022'de www.depremhaberleri.com alan adını almıştır. Uyuşmazlık açısından hangisi doğrudur?", 
+                options: ["A) A'nın iddiası doğru değildir, alan adı boştadır.", "B) A'nın dergisinin adı jenerik ibarelerden oluşmasına rağmen uzun yıllardır bu şekilde kullanıldığı ve yerleştiği hukuken korunur ve hak ihlaline karşı yollara başvurabilir.", "C) İlk gelen alır kuralı geçerlidir, sorun yoktur.", "D) A'nın markası meşhur marka olmuştur, B'nin şansı yoktur.", "E) Her ikisi de doğrudan Türkiye'de tescillidir."], 
+                ans: "B) A'nın elektronik dergisinin adı jenerik ibarelerden oluşmasına rağmen uzun yıllardır kullanıldığı için hukuken korunur...", 
+                exp: "Jenerik kelimeler olsa da A, emek ve bilinirlik (müktesep hak) yaratmıştır. Rakip B'nin kasten okuyucuları yanıltmak için .com versiyonunu alması kötü niyetli haksız rekabet sayılır.", 
+                exams: ["Vize", "Bütünleme", "2 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi çoğaltma hakkı kapsamında kalmaz?", 
+                options: ["A) Bir bilgisayar programını bir bilgisayardan diğerine indirmek", "B) Bir bilgisayar programını internetten bilgisayarına indirmek", "C) Cep telefonunu içindeki programla beraber başkasına satmak", "D) Bir bilgisayar programını bilgisayarda çalıştırmak", "E) Bir bilgisayar programını sadece kısmen çoğaltmak"], 
+                ans: "C) Cep telefonunu içindeki programla beraber başkasına satmak", 
+                exp: "<span class='warning-text'>⚠️ DİKKAT:</span> İçinde yazılım olan fiziki cihazı satmak yeni bir kopya yaratmadığı için çoğaltma değil, mülkiyet devri yani 'yayma (satış) hakkının tükenmesi' kapsamındadır.", 
+                exams: ["Vize", "Bütünleme", "2 Kez Çıktı!", "⚠️ Dikkat!"] 
+            },
+            { 
+                q: "Patent hukuku açısından aşağıdakilerden hangisi doğrudur?", 
+                options: ["A) Bu hukuk alanı Sınai Mülkiyet Kanununda düzenlenmiş temel alanlardan biridir.", "B) Patent hukuku markaların korunmasını sağlar.", "C) Eserler de patentle korunur.", "D) FSEK ile patent bir bütündür.", "E) Bilgisayar programlarının asıl korunduğu alan patent hukukudur."], 
+                ans: "A) Bu hukuk alanı Sınai Mülkiyet Kanununda düzenlenmiş temel alanlardan biridir.", 
+                exp: "Türkiye'de patentler, 6769 Sayılı Sınai Mülkiyet Kanunu (SMK) altında düzenlenmiştir. Bilgisayar programları asıl olarak eser sayılır (FSEK).", 
+                exams: ["Vize", "Bütünleme", "2 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdaki fiillerden hangisi bilgisayar programlarının FSEK kapsamında korunması açısından önem taşımaz?", 
+                options: ["A) Programı ilk kez kamuya arz etmek", "B) Programı çoğaltmak", "C) Çoğaltılmış nüshaları yaymak", "D) Programı işleyerek daha gelişmiş hale getirmek", "E) Bir bilgisayar programının hangi dilde yazıldığını kamuoyuna açıklamak"], 
+                ans: "E) Bir bilgisayar programının hangi dilde yazıldığını kamuoyuna açıklamak", 
+                exp: "Programın yazıldığı dili (C++, Java vb.) söylemek telif ihlali doğurmaz, hukuki bir tasarruf eylemi değildir. Diğerleri mali/manevi hakların kullanımıdır.", 
+                exams: ["Vize"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi bilişim hukukunun asli konularından değildir?", 
+                options: ["A) Bilgisayar programlarının nasıl programlanacağı", "B) Sosyal medya hukuki rejimi", "C) Elektronik sözleşmeler", "D) Alan adları hukuki rejimi", "E) İnternette reklam hukuku sorunları"], 
+                ans: "A) Bilgisayar programlarının nasıl programlanacağı", 
+                exp: "Bir yazılımın hangi algoritmayla, hangi kod diliyle yazılacağı mühendislik/teknik bir konudur. Hukuk kuralları ve uyuşmazlıkları ile ilgilenmez.", 
+                exams: ["Vize", "Bütünleme", "2 Kez Çıktı!"] 
+            },
+            { 
+                q: "Sosyal ağ sağlayıcıların tanımlandığı kanun aşağıdakilerden hangisidir?", 
+                options: ["A) Elektronik Ticaret Kanunu", "B) Sosyal Medya Kanunu", "C) Türk Borçlar Kanunu", "D) Evrensel Hizmet Kanunu", "E) İnternet Kanunu (5651 Sayılı Kanun)"], 
+                ans: "E) İnternet Kanunu (5651 Sayılı Kanun)", 
+                exp: "Kamuoyunda Sosyal Medya Yasası olarak bilinen düzenlemeler ayrı bir yasa değildir, 5651 Sayılı İnternet Kanunu'nun içine eklenmiştir.", 
+                exams: ["Vize", "Final", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi doğrudan bilişim hukuku kapsamına giren bir reklam hukuku sorunu doğurma potansiyeline sahip değildir?", 
+                options: ["A) Önceden olurunu/iznini almadan bir kişiye reklam e-postaları göndermek", "B) Web sitesinde başkalarının reklam vermesini sağlamak", "C) Bir reklam filmi yaptırmak/ürettirmek üzere film şirketine e-posta göndermek", "D) Arama motoru üzerinden anahtar sözcük reklamı yapmak", "E) Alışveriş platformunun mağazalara kendi reklamını zorunlu kılması"], 
+                ans: "C) Bir reklam filmi yaptırmak/ürettirmek üzere film şirketine e-posta göndermek", 
+                exp: "Bir ajansa reklam çektirmek için atılan e-posta standart bir ticari iletişim/iş görüşmesidir, doğrudan bilişim-reklam uyuşmazlığı yaratmaz.", 
+                exams: ["Final", "Bütünleme", "2 Kez Çıktı!"] 
+            },
+            { 
+                q: "Doğa gezisi tutkunu A, gezilerinde çektiği fotoğraflarını web sitesinde yayınlamaktadır. A'nın fotoğraflarına çok sayıda link verilmeye başlanmıştır. Hukuki altyapı açısından aşağıdakilerden hangisi yanlıştır?", 
+                options: ["A) A'nın fotoğrafları iradesi hilafına internette yayınlanmış olsaydı, ticari amaçlı olanların bilmesi gerektiği karinesi işlerdi.", "B) A, fotoğrafları teknik önlem olmadan web sitesine koyduğundan, normal kullanıcılar her durumda bunu indirip kendi hesaplarında sorunsuz paylaşabilirler.", "C) Normal link ile frame link arasındaki fark umuma iletim hakkı açısından kural olarak önemli değildir.", "D) Teknik önlem yoksa normal kullanıcılar serbestçe link verebilirler.", "E) İradesi hilafına yayınlansaydı normal kullanıcıların link vermesi kural olarak hukuka uygun olurdu."], 
+                ans: "B) A, fotoğrafları teknik önlem olmadan web sitesine koyduğundan, normal kullanıcılar her durumda bunu indirip kendi hesaplarında sorunsuz paylaşabilirler.", 
+                exp: "Şifre/önlem olmaması eserin telifinden vazgeçildiği anlamına gelmez. İndirip kendi hesabına tekrar yüklemek (paylaşmak) ticari amaçsız da olsa çoğaltma ve umuma iletim ihlalidir.", 
+                exams: ["Vize", "Final", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi sosyal medya ve buna dair muhtemel hukuki sorunlar kapsamında değerlendirilmez?", 
+                options: ["A) Bir arkadaşının yazdığı şiirini izinsiz paylaşmak", "B) Gerçekte yaşanmamış bir deneyimi yaşanmış gibi göstererek rakip ürünü kötülemek", "C) Fenomenin arka planda gizli marka reklamı yapması", "D) Sosyal hesaplarının hukuki niteliği", "E) İnternetten elektronik imza kullanarak bir işlem yapmak"], 
+                ans: "E) İnternetten elektronik imza kullanarak bir işlem yapmak", 
+                exp: "E-imza ile resmi evrak imzalamak e-devlet/e-ticaret konusudur, doğrudan sosyal medyanın platform içi etkileşim sorunlarından biri değildir.", 
+                exams: ["Final", "Bütünleme", "2 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi fikri mülkiyet hukuku kapsamında kalan bir hak değildir?", 
+                options: ["A) Bir bilgisayar programının yazılması sürecinde kaynak bulup, fotokopi yapıp çalışanlara sunan personelin işverenden ücret talep etme hakk", "B) Algoritmayı geliştiren ve uygulayan kişinin buluş sahibi olarak anılma hakkı", "C) Eser sahibinin anılma hakkı", "D) Yazarın eserini çoğaltma hakkı", "E) Roman yazarının nüshalarına ilişkin yayma hakkı"], 
+                ans: "A) Bir bilgisayar programının yazılması sürecinde kaynak bulup, fotokopi yapıp çalışanlara sunan personelin işverenden ücret talep etme hakkı", 
+                exp: "Fotokopi çekmek veya dosya taşımak fikri yaratım süreci değildir. Ücret/maaş talep edilmesi İş Hukuku'nun konusudur, telif hakkı doğurmaz.", 
+                exams: ["Vize", "Bütünleme", "2 Kez Çıktı!"] 
+            },
+            { 
+                q: "Bilişim suçları açısından aşağıdakilerden hangisi yanlıştır?", 
+                options: ["A) Klasik suçların bilişim ortamında işlenmesi de bilişim suçu sorunu oluşturur.", "B) FSEK gibi özel kanunlarda düzenlenmiş bilişim suçları vardır.", "C) Kişilik hakkı ihlalleri bilişim suçları kapsamında kalan en önemli konu olduğundan, bilişim suçları kısmen TMK'da düzenlenmiştir.", "D) İlk yasal düzenlemeler genellikle bilişim suçlarına ilişkindir.", "E) Bilişim suçlarının asıl olarak düzenlendiği kanun TCK'dır."], 
+                ans: "C) Kişilik hakkı ihlalleri bilişim suçları kapsamında kalan en önemli konu olduğundan, bilişim suçları kısmen TMK'da düzenlenmiştir.", 
+                exp: "<span class='warning-text'>⚠️ DİKKAT:</span> TMK (Medeni Kanun) hapis veya suç düzenlemez, tazminat ve medeni hakları düzenler. Bilişim suçlarının asıl yeri Türk Ceza Kanunu'dur (TCK).", 
+                exams: ["Final", "Bütünleme", "2 Kez Çıktı!", "⚠️ Dikkat!"] 
+            },
+            { 
+                q: "Arama motorları üzerinden anahtar sözcük reklamcılığında negatif eşleme açısından aşağıdakilerden hangisi doğrudur?", 
+                options: ["A) Negatif eşlemede seçilen türe göre, anahtar sözcük ile örtüşen sözcüklerde reklam gösterilmez.", "B) SMK m.7 negatif eşlemeyi de kapsamaktadır.", "C) Bu bir banner reklam türüdür.", "D) Anahtar sözcük ile arama sözcüğü aynı olduğunda reklam gösterilir.", "E) Sadece dar eşleme yapılabildiğinden hukuki sorun çıkmaz."], 
+                ans: "A) Negatif eşlemede seçilen türe göre, anahtar sözcük ile örtüşen sözcüklerde reklam gösterilmez.", 
+                exp: "Dijital pazarlamada negatif eşleme, belirli kelimeler aratıldığında sizin reklamınızın gizlenmesini (gösterilmemesini) sağlayan özelliktir.", 
+                exams: ["Final", "Bütünleme", "2 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi arama motoru bazı reklamlara dair bir hukuki sorun olarak görülemez?", 
+                options: ["A) Markasıyla örtüşen işareti negatif eşleme listesine eklemeyi talep etmek", "B) Sanatçının adını rızasız anahtar sözcük seçmek", "C) Yazarın roman başlığını rızasız seçmek", "D) Başkasının markasıyla reklam yapmak", "E) Kişinin yıllar önce yaşadığı bir olumsuzluğun aramalarda öne çıkmasını engellemek için uğraşmak"], 
+                ans: "E) Kişinin yıllar önce yaşadığı bir olumsuzluğun aramalarda öne çıkmasını engellemek için uğraşmak", 
+                exp: "E şıkkı organik arama sonuçlarından haber sildirme ile yani 'Unutulma Hakkı' ile ilgilidir, anahtar sözcük reklamcılığı (AdWords) ihlali değildir.", 
+                exams: ["Final", "Bütünleme", "2 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi bilişim hukuku kapsamında kalan bir sosyal medya hukuku sorunu değildir?", 
+                options: ["A) Sosyal medya hesabı sahibinin ölümü sonrasında hesabın mirasçılara kalıp kalmayacağı", "B) Sosyal medyada tanışan iki kişinin sonradan nişanlanması", "C) İnternet fenomeninin ilaç ve sağlık malzemeleri pazarlaması", "D) Öğrencilerin öğretmenleri hakkında gerçeği yansıtmayan değerlendirmelerde bulunmaları", "E) Sosyal ağ sağlayıcının yargı kararını yirmi dört saat içinde uygulamaması"], 
+                ans: "B) Sosyal medyada tanışan iki kişinin sonradan nişanlanması", 
+                exp: "İnternette tanışıp nişanlanmak günlük bir yaşam/sosyal olaydır ve Aile Hukuku'nu ilgilendirir, çözülmesi gereken bir sosyal medya uyuşmazlığı değildir.", 
+                exams: ["Final", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "Bilişim sistemine girme suçu (TCK m. 243) açısından aşağıdakilerden hangisi doğrudur?", 
+                options: ["A) Sisteme yeni veri eklenmesi de şarttır.", "B) Taksirle de işlenebilir.", "C) Bu suçta bir zarar veya sonuç elde edilmesi gerekmez (burada zarar bir unsur değildir).", "D) Suça iştirak mümkün değildir.", "E) Teşebbüse uygun bir suç değildir."], 
+                ans: "C) Bu suçta bir zarar veya sonuç elde edilmesi gerekmez (burada zarar bir unsur değildir).", 
+                exp: "Sisteme izinsiz giriş yapmak tek başına bir 'soyut tehlike' suçudur. İçeride dosya silmese veya veri eklemese dahi login olduğu an suç oluşur.", 
+                exams: ["Final", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi FSEK itibariyle programcının (eser sahibinin) kanunda düzenlenmiş mali haklarından biridir?", 
+                options: ["A) Programı yayma hakkı", "B) Takip edilmeme hakkı", "C) Programı işlettirme hakkı", "D) Program hakkında patent alma hakkı", "E) Programı tescil ettirme hakkı"], 
+                ans: "A) Programı yayma hakkı", 
+                exp: "FSEK kapsamındaki 5 temel mali hak: Çoğaltma, Yayma, Temsil, İşleme ve Umuma İletim'dir. Diğer şıklar yasal mali hak değildir.", 
+                exams: ["Vize", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi e-ticaret hukuku açısından ele alınabilecek bir konu değildir?", 
+                options: ["A) İki şirketin Skype üzerinden görüşerek sözleşme yapması", "B) Şirketin web sitesinde diğerinin ürünlerini kötüleyici ibareler kullanması", "C) Olağan (ticari olmayan) kullanıcının son gittiği tatil görüntülerini paylaşması", "D) Kredi kartıyla ödeme yapıp dolandırılması", "E) Tüketicinin platformda diğer bir tüketiciye satması"], 
+                ans: "C) Olağan (ticari olmayan) kullanıcının son gittiği tatil görüntülerini paylaşması", 
+                exp: "E-ticaret ticari işlemlerle ilgilenir. Ticari amacı olmayan bir bireyin tatil fotoğrafı yüklemesi e-ticaret konusu olamaz.", 
+                exams: ["Final", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi fikri mülkiyet hukukuyla ilgili bir temel ilkeyi karşılar veya ifade eder?", 
+                options: ["A) Bağımlı çalışanların yarattıkları üzerinde herhangi bir haklarının olmaması", "B) Bir fikri ürünün fikri mülkiyet hukukunun farklı alanlarında aynı anda birlikte korunabilmesinin mümkün olması", "C) Sadece ticari önemi olanların korunması", "D) Sadece ülke sınırları içinde korunması", "E) Sadece eşya haline gelmiş olanların korunması"], 
+                ans: "B) Bir fikri ürünün fikri mülkiyet hukukunun farklı alanlarında aynı anda birlikte korunabilmesinin mümkün olması", 
+                exp: "Bir ürün hem FSEK (Eser) hem de SMK (Tasarım/Patent) olarak çoklu/kümülatif korumadan faydalanabilir.", 
+                exams: ["Vize", "Final", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "Fikir ve sanat eserleri kapsamında korunan ve internette yayınlanmış bir esere link verilmesi, asıl olarak aşağıdakilerden hangi hak açısından önem taşımaktadır?", 
+                options: ["A) İşleme hakkı", "B) Çoğaltma hakkı", "C) Eserin bütünlüğünün korunması hakkı", "D) Umuma iletim hakkı", "E) Eserin orijinalini takip hakkı"], 
+                ans: "D) Umuma iletim hakkı", 
+                exp: "Dijital içeriklere link vermek doğrudan eserin internette kitlelere ulaştırılmasıyla ilgili olduğu için FSEK'teki 'Umuma İletim Hakkı' kapsamında değerlendirilir.", 
+                exams: ["Vize", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi kişisel verilerin işlenmesi açısından geçerli genel ilkelerden değildir?", 
+                options: ["A) Belirli, açık ve meşru amaçlarla işlenmesi", "B) Şeffaflık ilkesi", "C) Güvenilirlik ve gizlilik", "D) Sosyal medyada açık tutulan kişisel verilerin işlenmesinin kural olarak serbestliği", "E) Hukuka ve dürüstlük kuralına uygunluk"], 
+                ans: "D) Sosyal medyada açık tutulan kişisel verilerin işlenmesinin kural olarak serbestliği", 
+                exp: "Telefonunuzu kendi rızanızla sosyal medyada public (açık) yapsanız bile, şirketler bunu izinsiz alıp reklam için serbestçe işleyemez.", 
+                exams: ["Final", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "Alan adına dair hukuki nitelik ve mutlak hak tartışması açısından aşağıdakilerden hangisi doğrudur?", 
+                options: ["A) Her zaman ve durumda mutlak hak sayılırlar.", "B) Tescil edilmekle eşya statüsünü kazandıklarından eşya olarak korunurlar.", "C) Gerçekte bir hak olmayıp sadece bir yükümlülük niteliğindedirler.", "D) Ticari değeri olanlar üzerinde tescille birlikte mutlak hak doğar.", "E) Alan adı duruma göre zamanla kullanım yoluyla marka haline gelebilir ve bu çerçevede bir mutlak hak olarak korunabilir."], 
+                ans: "E) Alan adı duruma göre zamanla kullanım yoluyla marka haline gelebilir ve bu çerçevede bir mutlak hak olarak korunabilir.", 
+                exp: "Boş bir isim tescil anında mülkiyet doğurmaz. Ancak yıllarca kullanılıp tanındığında, marka ve ticari değer kimliğine bürünerek korunmaya başlar.", 
+                exams: ["Vize", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi yer sağlayıcı açısından bir yükümlülüktür?", 
+                options: ["A) İçeriğin doğruluğunu ve hukuka uygunluğunu denetlemek", "B) Hukuka aykırı faaliyet yapılıp yapılmadığını denetlemek", "C) Kullanıcıların girdikleri verileri düzenli gözlemleyip saklamak", "D) Arama motorlarında kullanılmasını engellemek", "E) İçeriğin hukuka aykırı olduğu yargı sürecinde anlaşıldığında ve bildirim yapıldığında söz konusu içeriği yayından çıkarmak"], 
+                ans: "E) İçeriğin hukuka aykırı olduğu yargı sürecinde anlaşıldığında ve bildirim yapıldığında söz konusu içeriği yayından çıkarmak", 
+                exp: "Yer sağlayıcının (sunucunun) önceden denetleme yükümlülüğü yoktur. Yalnızca mahkeme veya yetkili merciden bildirim/karar gelirse içeriği kaldırmak zorundadır (Uyar-Kaldır).", 
+                exams: ["Final", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "İlgili Kanunda, 'başka bir elektronik veriye eklenen veya elektronik veriyle mantıksal bağlantısı bulunan ve kimlik doğrulama amacıyla kullanılan elektronik veri' şeklinde tanımlanan husus aşağıdakilerden hangisidir?", 
+                options: ["A) Elektronik ticaret", "B) Elektronik mantık verisi", "C) Elektronik kimlik", "D) Elektronik imza", "E) Elektronik veri bütünlüğü"], 
+                ans: "D) Elektronik imza", 
+                exp: "Soru metnindeki tırnak içindeki ifade, 5070 Sayılı Elektronik İmza Kanunu'nda yer alan Elektronik İmza'nın yasal, resmi tanımıdır.", 
+                exams: ["Final", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "Bilişim ceza hukukundaki koruma tedbirleri açısından aşağıdakilerden hangisi yanlıştır?", 
+                options: ["A) İnternet Kanununda düzenlenen koruma tedbirlerini vermeye asıl yetkili organ BTK başkanıdır.", "B) CMK m. 134 ile kuvvetli şüphe ve başka surette delil elde edilememesi halinde uygulanır.", "C) Kütüklerine elkoyma sırasında sistemdeki bütün verilerin yedeklemesi yapılır.", "D) İnternet Kanununda erişime engelleme veya içerikten çıkarma tedbirleri öngörülmüştür.", "E) CMK m. 134 arama, kopyalama ve el koymayla ilgilidir."], 
+                ans: "A) İnternet Kanununda düzenlenen koruma tedbirlerini vermeye asıl yetkili organ BTK başkanıdır.", 
+                exp: "<span class='warning-text'>⚠️ DİKKAT:</span> Bilgisayarlara el koyma, erişim engeli gibi koruma tedbirlerinde 'asıl yetkili organ Hakimliktir'. BTK Başkanı sadece çok spesifik istisnalarda ve gecikmesinde sakınca bulunan hallerde yetki kullanır.", 
+                exams: ["Final", "Bütünleme", "3 Kez Çıktı!", "⚠️ Dikkat!"] 
+            },
+            { 
+                q: "İnternet ortamında bağlantı sağladığı içeriği benimsediği ve kullanıcının söz konusu içeriğe ulaşmasını amaçladığı açıkça belli olma... ifadesi hangi ölçüte karşılık gelmektedir?", 
+                options: ["A) Çok amaç gütme ölçütü", "B) Ulaştırma ölçütü", "C) Dönüştürme ölçütü", "D) Benimseme ölçütü", "E) Hedef kitle ölçütü"], 
+                ans: "D) Benimseme ölçütü", 
+                exp: "Yasadışı bir içeriğe link verirken onu destekleyen, tavsiye eden ifadelere yer vermek hukuken 'Benimseme Ölçütü' ihlalini doğurur ve kişiyi sorumlu tutar.", 
+                exams: ["Vize", "Final", "Bütünleme"] 
+            },
+            { 
+                q: "Ticaret, iş, zanaat veya bir meslekle bağlantılı olarak, bir malın satışını sağlamak, hedef kitleyi ikna etmek amacıyla gerçekleştirilen pazarlama iletişimi niteliğindeki duyurulara ne ad verilir?", 
+                options: ["A) Siyasi reklam", "B) Toplu reklam", "C) Multimedya tipi reklam", "D) Ticari reklam", "E) Duyurum niteliğindeki reklam"], 
+                ans: "D) Ticari reklam", 
+                exp: "TKHK kapsamında markaların ürün veya hizmet satmak için tüketiciyi ikna etmeye yönelik yaptığı her türlü yasal duyurunun teknik adı 'Ticari Reklam'dır.", 
+                exams: ["Final", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi bir mesafeli sözleşme örneği değildir?", 
+                options: ["A) A'nın evindeki akıllı buzdolabının internetten otomatik süt sipariş etmesi", "B) WhatsApp üzerinden görüşerek kol saati satması", "C) Yapay zeka sistemlerinin programlanmaya uygun sözleşme yapmaları", "D) Bilgisayarın gece uyurken program çerçevesinde sipariş vermesi", "E) A'nın cep telefonunu bit pazarında B'ye yüz yüze satıp parasını alması"], 
+                ans: "E) A'nın cep telefonunu bit pazarında B'ye yüz yüze satıp parasını alması", 
+                exp: "Bit pazarında yüz yüze, fiziksel olarak yapılan satışlar 'uzaktan/mesafeli' değildir. Mesafeli sözleşme için arada internet, telefon vb. araç olmalıdır.", 
+                exams: ["Final", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "Ceza hukuku kapsamında, kanunda suç ve cezanın belirtilmiş olmasını, tanımlamaların belirli/net olmasını ifade eden ilke hangisidir?", 
+                options: ["A) Şeffaflık İlkesi", "B) Somut ceza ilkesi", "C) Suçun maddi ve manevi unsuru ilkesi", "D) Kusura dayalı ceza ilkesi", "E) Suçta ve cezada kanunilik ilkesi"], 
+                ans: "E) Suçta ve cezada kanunilik ilkesi", 
+                exp: "Bir kişinin cezalandırılabilmesi için o eylemin ve cezasının açıkça kanunda önceden yazıyor olması şartına 'Kanunsuz Suç ve Ceza Olmaz' yani Kanunilik İlkesi denir.", 
+                exams: ["Final", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi reklam hukuku kapsamında geçerli ilkelerden değildir?", 
+                options: ["A) Reklamların karşılaştırma içermemesi", "B) Genel ahlak kurallarına aykırı olmaması", "C) İnsan onurunu zedelememesi", "D) Örtülü reklamın yasak olması", "E) Küçükleri şiddete itmemesi"], 
+                ans: "A) Reklamların karşılaştırma içermemesi", 
+                exp: "Hukuk sistemimizde rakiplere haksız iftira atmamak şartıyla 'karşılaştırmalı reklam' (örneğin deterjan reklamları) yapmak kanunen serbesttir.", 
+                exams: ["Final", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "İnternet Kanunu m. 8/A kapsamında verilebilecek acil koruma tedbirleri açısından hangisi bir gerekçe değildir?", 
+                options: ["A) Suç işlenmesinin önlenmesi", "B) Kişilerin can ve mal güvenliğinin korunması", "C) Yaşam hakkının korunması", "D) İnternet genel düzeninin sağlanması ve korunması", "E) Genel sağlığın korunması"], 
+                ans: "D) İnternet genel düzeninin sağlanması ve korunması", 
+                exp: "Kanunda 'İnternet genel düzenini sağlama' adında çok yoruma açık, keyfi bir erişim engelleme (sansür) gerekçesi kesinlikle yer almamaktadır.", 
+                exams: ["Final", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "İnternette yayınlanan bir videoda oyuncuların kullandığı yemek takımının markasının açıkça görülmesi reklam hukuku itibariyle hangisine denk gelir?", 
+                options: ["A) Yanıltıcı reklam", "B) Ürün yerleştirme yoluyla reklam", "C) Karşılaştırmalı reklam", "D) Seçeneksiz reklam", "E) Belirsiz reklam"], 
+                ans: "B) Ürün yerleştirme yoluyla reklam", 
+                exp: "Dizi, film veya kliplerde senaryonun içine yedirilerek bir markanın izleyiciye gösterilmesi pazarlama hukukunda 'Ürün Yerleştirme' (Product Placement) olarak adlandırılır.", 
+                exams: ["Final", "Bütünleme", "3 Kez Çıktı!"] 
+            },
+            { 
+                q: "Avrupa Adalet Divanı (ABAD) link vermeden kaynaklı sorumluluk hususunda pek çok karar vermiştir. Hangi tespit yanlıştır?", 
+                options: ["A) ABAD, link verenin içeriğin hukuka aykırı olduğunu bilmesine önem atfetmektedir.", "B) Umuma iletim hakkının geniş anlaşılmasını benimsemektedir.", "C) Eserin öngörülen kitleden farklı bir yeni kitleye açılmasını esas almaktadır.", "D) Adalet Divanının içtihadına göre bir başkasının eserini önce kopyalayıp, sonra bunu kendi web sitesinde yayınlamak serbesttir.", "E) Link verenin merkezi rolü ölçütlerden biridir."], 
+                ans: "D) Adalet Divanının içtihadına göre bir başkasının eserini önce kopyalayıp, sonra bunu kendi web sitesinde yayınlamak serbesttir.", 
+                exp: "<span class='warning-text'>⚠️ DİKKAT:</span> Başkasının eserini bilgisayara kopyalayıp kendi sitesinde tekrar yayımlamak doğrudan telif hakkı hırsızlığıdır, serbest olamaz.", 
+                exams: ["Vize", "Final", "Bütünleme", "⚠️ Dikkat!"] 
+            },
+            { 
+                q: "Doğrudan sosyal medya üzerinden pek çok fikri hak ihlali gerçekleşmektedir. Aşağıdakilerden hangisi doğrudan bu kapsamda bir fikri hak ihlalidir?", 
+                options: ["A) Sosyal ağ kullanıcılarını gösteriye çağırmak üzere bildiri yayımlamak", "B) Bir çizerin çizdiği karikatürünü izni olmadan hesabında yayınlaması", "C) Sosyal medya şirketinin kullandığı yazılımı hacklemek", "D) Sinema sanatçısının gerçek olmayan tatil haberlerini yaymak", "E) Hangi filmi izlediğini sosyal medyada açıklaması"], 
+                ans: "B) Bir çizerin çizdiği karikatürünü izni olmadan hesabında yayınlaması", 
+                exp: "Karikatür FSEK'e göre eserdir. İzni olmadan yayınlamak telif/fikri hak ihlalidir. Diğerleri hack (bilişim suçu), yalan haber (kişilik hakkı) ve ifade özgürlüğüdür.", 
+                exams: ["Vize", "Final", "Bütünleme"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi fikir ve sanat eserleri hukukunda korunan bir eser üzerindeki fikri haklardan değildir?", 
+                options: ["A) Umuma iletim hakkı", "B) Çoğaltma hakkı", "C) İşletme hakkı", "D) Eser sahibi olarak anılma hakkı", "E) Yayma hakkı"], 
+                ans: "C) İşletme hakkı", 
+                exp: "Eser sahibinin FSEK'te belirtilen mali hakları çoğaltma, yayma, temsil, umuma iletim ve 'işleme' haklarıdır. Ancak 'işletme hakkı' şeklinde tanımlanmış bir hak yoktur, kelime oyunu yapılmıştır.", 
+                exams: ["Vize", "Bütünleme"] 
+            },
+            { 
+                q: "İnternette özel hayatına dair görüntüleri hukuka aykırı şekilde yayınlanan bir kişi, kişilik hakkının korunması kapsamında, aşağıdaki imkanlardan hangisinden hukuken yararlanamaz?", 
+                options: ["A) Sona ermiş saldırı açısından hukuka aykırılığın tespitini talep etmek", "B) Vekaletsiz iş görme çerçevesinde elde ettiği kazancın kendisine verilmesini talep etmek", "C) Manevi zararının giderilmesini istemek", "D) Görüntülerin dijital filtrelemeden/dönüştürülmeden geçirilerek olduğundan daha güzel görünmesini talep etmek", "E) Görüntülerin yayından kaldırılmasını talep etmek"], 
+                ans: "D) Görüntülerin dijital filtrelemeden/dönüştürülmeden geçirilerek olduğundan daha güzel görünmesini talep etmek", 
+                exp: "Kişi mahkemeden saldırıyı durdurma, tespiti veya tazminat isteyebilir. Ancak hukuken 'Beni filtreyle güzelleştirip öyle yayınla' diye bir yasal dava hakkı yoktur.", 
+                exams: ["Final", "Bütünleme"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi suçun maddi unsurunu ortaya koyan bir açıklamadır?", 
+                options: ["A) Kanunda suç olarak belirtilen fiil ya da fiillerin birebir ve kanunda öngörüldüğü şekilde gerçekleştirilmesi maddi unsuru ifade eder.", "B) Suçla bir maddiyat elde edilmesi hedeflenmiş ise buna maddi unsur denir.", "C) Bir fiilin suç olabilmesi için hukuka aykırılığı olması gerektiğinden, işte bu hukuka aykırılık yönüne maddi unsur denir.", "D) Bir suç ancak aktif bir hareketle işlenebileceğinden, maddi unsurla kastedilen bu durumdur.", "E) Bir suçu bilerek işlemek gerektiğinden, buradaki 'bilerek işlemek' maddi unsuru ifade eder."], 
+                ans: "A) Kanunda suç olarak belirtilen fiil ya da fiillerin birebir ve kanunda öngörüldüğü şekilde gerçekleştirilmesi maddi unsuru ifade eder.", 
+                exp: "Ceza hukukunda maddi unsur, failin dış dünyada kanunda tarif edilen yasak eylemi bizzat gerçekleştirmesi demektir. Para/maddiyat kazanmak demek değildir.", 
+                exams: ["Final"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi reklam hukuku açısından önem taşıyan yasal kaynaklardan sayılmaz?", 
+                options: ["A) İnternet Kanunu", "B) E-Ticaret Kanunu", "C) Tüketicilerin Korunması Hakkında Kanun", "D) RTÜK Kanunu", "E) Düzensiz Reklamları İzleme Kanunu"], 
+                ans: "E) Düzensiz Reklamları İzleme Kanunu", 
+                exp: "Hukuk sistemimizde reklamları denetleyen Tüketici, RTÜK ve E-Ticaret kanunları vardır ancak 'Düzensiz Reklamları İzleme Kanunu' isminde uydurma bir kanun yoktur.", 
+                exams: ["Final", "Bütünleme"] 
+            },
+            { 
+                q: "Kişilik hakkının hukuki temeli, kapsamı ve hukuki niteliği açısından aşağıdakilerden hangisi yanlıştır?", 
+                options: ["A) Kişilik hakkının korunmasına yönelik bazı imkanlar İnternet Kanununda öngörülmüştür.", "B) Kişinin özel hayatı kişilik değerlerinden biridir.", "C) Kişilik hakkı bir nispi haktır.", "D) Bu hakkın anayasal dayanakları bulunmaktadır.", "E) Temel düzenlemeler TMK'da yer almaktadır."], 
+                ans: "C) Kişilik hakkı bir nispi haktır.", 
+                exp: "<span class='warning-text'>⚠️ DİKKAT:</span> Nispi haklar (alacak vb.) sadece muhataba karşı ileri sürülebilir. Kişilik hakları ise dünyadaki herkese karşı ileri sürülebilen 'Mutlak Haklar'dır.", 
+                exams: ["Final", "Bütünleme", "⚠️ Dikkat!"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi arama motoru bazı reklamlara dair bir hukuki sorun olarak görülemez?", 
+                options: ["A) Markasıyla örtüşen işareti negatif eşleme listesine eklemeyi talep etmek", "B) Sanatçının adını rızasız anahtar sözcük seçmek", "C) Yazarın roman başlığını rızasız seçmek", "D) Başkasının markasıyla reklam yapmak", "E) Kişinin yıllar önce yaşadığı bir olumsuzluğun aramalarda öne çıkmasını engellemek için uğraşmak"], 
+                ans: "E) Kişinin yıllar önce yaşadığı bir olumsuzluğun aramalarda öne çıkmasını engellemek için uğraşmak", 
+                exp: "E şıkkı organik arama sonuçlarından haber sildirme ile yani 'Unutulma Hakkı' ile ilgilidir, anahtar sözcük reklamcılığı (AdWords) ihlali değildir.", 
+                exams: ["Final", "Bütünleme"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi güncel alan adı sistemimiz açısından doğrudan aktörlerden biri olarak görülebilir?", 
+                options: ["A) Erişim sağlayıcılar", "B) İTÜ", "C) Alan adı kayıt kuruluşları", "D) Yer sağlayıcılar", "E) Türkpatent"], 
+                ans: "C) Alan adı kayıt kuruluşları", 
+                exp: "Alan adı sisteminin (TRABİS) işleyişinde domain satışını gerçekleştiren 'Alan Adı Kayıt Kuruluşları' (Nokta AŞ, METU vb.) doğrudan aktörlerdir.", 
+                exams: ["Vize", "Bütünleme"] 
+            },
+            { 
+                q: "Belirli bir hukuki sonuç doğurmaya yönelik ve hukuk düzeni tarafından tanınan irade açıklamasına ne denir?", 
+                options: ["A) Vekaletsiz iş görme", "B) Haksız fiil", "C) Tüketici işlemi", "D) E-ticaret", "E) Hukuki işlem"], 
+                ans: "E) Hukuki işlem", 
+                exp: "Medeni Hukuk ve Borçlar Hukukunda, sözleşme kurmak veya hak devretmek için kişinin yaptığı geçerli irade beyanına 'Hukuki İşlem' denir.", 
+                exams: ["Final", "Bütünleme"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi İnternet Kanununda özellikle yurt dışı kaynaklı sosyal ağ sağlayıcılara getirilen yükümlülüklerden değildir?", 
+                options: ["A) Kişilik hakkı ihlallerine dair başvurulara zamanında cevap verme", "B) Küçüklere özgü ayrıştırılmış hizmet sunma tedbirleri alma", "C) Temsilci bulundurma yükümlülüğü", "D) Reklam kütüphanesi oluşturarak reklam raporu verme", "E) En son teknikle geliştirilmiş yapay zekalı program filtreleri kullanma yükümlülüğü"], 
+                ans: "E) En son teknikle geliştirilmiş yapay zekalı program filtreleri kullanma yükümlülüğü", 
+                exp: "Kanun temsilci atamayı ve şikayetlere yanıt vermeyi zorunlu tutar ancak şirketleri 'en son yapay zekayı kullanmak zorundasın' diye devasa ve sübjektif bir teknolojik yatırıma yasal olarak mecbur kılmaz.", 
+                exams: ["Final", "Bütünleme"] 
+            },
+            { 
+                q: "Menfaat teorisi, hangi tür çıkarın dikkate alındığına bakarken ikna edici değildir. Özne teorisi hukuki ilişkinin taraflarını esas alarak bir tasnif gerçekleştirir. Bu ifade hangi hukuki ayrımı anlatmaktadır?", 
+                options: ["A) Kamu hukuku ve özel hukuk ayrımı", "B) Kamu adaleti ve sosyal", "C) Maddi hukuk şekli hukuk ayrımı", "D) Hukuk düzeninin karmaşık yapısı", "E) Kurallar hiyerarşisi"], 
+                ans: "A) Kamu hukuku ve özel hukuk ayrımı", 
+                exp: "Hukuk biliminde devleti ve vatandaşı ayıran bu teoriler (Menfaat ve Özne teorisi), Kamu Hukuku ile Özel Hukuku birbirinden ayırmak için kullanılır.", 
+                exams: ["Vize", "Bütünleme"] 
+            },
+            { 
+                q: "İşletme veya kamu idaresinde yükümlü olduğu faaliyeti gereği, işverenin imkanları ile gerçekleştirilen bilgisayar programı gibi buluşlara verilen isim hangisidir?", 
+                options: ["A) Ortak buluş", "B) Ticari buluş", "C) Serbest buluş", "D) Yardımsal buluş", "E) Hizmet buluşu"], 
+                ans: "E) Hizmet buluşu", 
+                exp: "SMK'ya göre mesai saatleri içinde ve işin gereği olarak (şirketin cihazlarıyla) yapılan buluşlara yasal olarak 'Hizmet Buluşu' denir.", 
+                exams: ["Vize", "Bütünleme"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi bilişim hukukunun temel işlevlerinden biridir?", 
+                options: ["A) Dijital ortamların hukuki yapılanışına dair hukuki rejimi düzenlemek veya belirlemek", "B) Ekonomik faaliyetlerin sürekliliğini sağlamak", "C) İnternetin ekonomik yapılanmasını sağlamak", "D) Sosyal medyanın yaygınlaşmasını sağlamak", "E) Eğitimin düzeyinin artmasına katkı sağlamak"], 
+                ans: "A) Dijital ortamların hukuki yapılanışına dair hukuki rejimi düzenlemek veya belirlemek", 
+                exp: "Hukukun asıl görevi kullanım artırmak veya ekonomiyi büyütmek değil, dijital dünyadaki sınırları, hakları ve ihlal cezalarını (hukuki rejimi) belirlemektir.", 
+                exams: ["Vize", "Bütünleme"] 
+            },
+            { 
+                q: "Aşağıdakilerden hangisi doğrudan dijital miras ve buna dair hukuki rejimle alakalı bir sorun değildir?", 
+                options: ["A) Alan adının mirasçılara geçip geçmeyeceği", "B) Kripto paranın hukuki durumu", "C) E-posta adresinin hukuki rejimi", "D) Bir kişinin sosyal medya hesabında takma ad kullanması", "E) Meşhur kişinin ölümü halinde hesabın durumu"], 
+                ans: "D) Bir kişinin sosyal medya hesabında takma ad kullanması", 
+                exp: "Yaşayan birinin internette 'nickname' kullanması kişilik hakları/anonimlik meselesidir. Ölümden sonra malvarlığının paylaşılması (miras) ile ilgisi yoktur.", 
+                exams: ["Final", "Bütünleme"] 
+            },
+            { 
+                q: "Sosyal etkileşim amacıyla metin, görüntü, ses paylaşımına imkan sağlayan kişilere/platformlara ne ad verilir?", 
+                options: ["A) Sosyal ağ sağlayıcı", "B) Toplu internet kullanım sağlayıcı", "C) Erişim sağlayıcı", "D) İçerik sağlayıcı", "E) Yer sağlayıcı"], 
+                ans: "A) Sosyal ağ sağlayıcı", 
+                exp: "Instagram, Twitter gibi platformların 5651 sayılı kanun 2. maddesine 2020'de eklenen yasal tanımı 'Sosyal Ağ Sağlayıcı'dır.", 
+                exams: ["Vize", "Bütünleme"] 
+            },
+            { 
+                q: "Hukuk sisteminde maddi hukuku açıklayan en uygun önerme aşağıdakilerden hangisidir?", 
+                options: ["A) Uluslararası hukukta hak süjelerini tanıyan", "B) Maddi hukuk kişilerin sahip olduğu hakları/hukuki pozisyonları düzenleyen, tanımlayan ve ortaya koyan hukuk dalıdır.", "C) Sadece kamu hukuku alanıyla ilgilenen", "D) Uyuşmazlıkların nasıl çözüleceğini düzenleyen", "E) Yargı organlarını belirleyen"], 
+                ans: "B) Maddi hukuk kişilerin sahip olduğu hakları/hukuki pozisyonları düzenleyen, tanımlayan ve ortaya koyan hukuk dalıdır.", 
+                exp: "Medeni Kanun veya Ceza Kanunu gibi hakları doğrudan var edenlere Maddi Hukuk; bu hakların ihlalinde davaların nasıl açılacağını gösteren usul kurallarına Şekli Hukuk denir.", 
+                exams: ["Vize", "Bütünleme"] 
+            }
+        ];
+
+        let allAnswersVisible = false;
+
+        function filterQuestions(type, btnElement) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+
+            let filtered = sorular;
+            if (type !== 'all') {
+                filtered = sorular.filter(soru => 
+                    soru.exams.some(exam => exam.toLowerCase().includes(type.toLowerCase()))
+                );
+            }
+
+            filtered.forEach((soru, index) => {
+                let tagsHtml = soru.exams.map(exam => {
+                    if(exam.includes("Kez Çıktı")) {
+                        return `<span class="exam-tag freq-tag">🔥 ${exam}</span>`;
+                    } else if(exam.includes("Dikkat")) {
+                        return `<span class="exam-tag" style="background-color: #fcf3cf; color: #d35400; border: 1px solid #d35400;">${exam}</span>`;
+                    }
+                    return `<span class="exam-tag">${exam}</span>`;
+                }).join('');
+
+                let optionsHtml = soru.options.map(opt => `<li>${opt}</li>`).join('');
+                
+                let displayState = allAnswersVisible ? 'block' : 'none';
+                let btnText = allAnswersVisible ? 'Cevabı ve Açıklamayı Gizle' : 'Cevabı ve Açıklamayı Göster';
+                let btnColor = allAnswersVisible ? '#34495e' : '#0984e3';
+
+                const card = document.createElement('div');
+                card.className = 'question-card';
+                card.innerHTML = `
+                    <div class="q-header">
+                        <div class="exam-tags">${tagsHtml}</div>
+                    </div>
+                    <p class="question-text">${index + 1}. ${soru.q}</p>
+                    <ul class="options">${optionsHtml}</ul>
+                    <button class="btn-toggle" style="background-color: ${btnColor}" onclick="toggleSingleAnswer(this)">${btnText}</button>
+                    <div class="answer-area" style="display: ${displayState}">
+                        <p class="correct-ans">✔️ Doğru Cevap: ${soru.ans}</p>
+                        <p class="exp-text">💡 <strong>Açıklama:</strong> ${soru.exp}</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function toggleSingleAnswer(btn) {
+            const targetDiv = btn.nextElementSibling;
+            if (targetDiv.style.display === 'none' || targetDiv.style.display === '') {
+                targetDiv.style.display = 'block';
+                btn.textContent = 'Cevabı ve Açıklamayı Gizle';
+                btn.style.backgroundColor = '#34495e';
+            } else {
+                targetDiv.style.display = 'none';
+                btn.textContent = 'Cevabı ve Açıklamayı Göster';
+                btn.style.backgroundColor = '#0984e3';
+            }
+        }
+
+        function toggleAllAnswers() {
+            allAnswersVisible = !allAnswersVisible;
+            const globalBtn = document.getElementById('globalToggleBtn');
+            const allAnswerAreas = document.querySelectorAll('.answer-area');
+            const allToggleBtns = document.querySelectorAll('.btn-toggle');
+
+            if (allAnswersVisible) {
+                globalBtn.textContent = 'Tüm Cevapları ve Açıklamaları Gizle';
+                globalBtn.style.backgroundColor = '#34495e';
+                
+                allAnswerAreas.forEach(area => area.style.display = 'block');
+                allToggleBtns.forEach(btn => {
+                    btn.textContent = 'Cevabı ve Açıklamayı Gizle';
+                    btn.style.backgroundColor = '#34495e';
+                });
+            } else {
+                globalBtn.textContent = 'Tüm Cevapları ve Açıklamaları Göster';
+                globalBtn.style.backgroundColor = 'var(--global-btn)';
+                
+                allAnswerAreas.forEach(area => area.style.display = 'none');
+                allToggleBtns.forEach(btn => {
+                    btn.textContent = 'Cevabı ve Açıklamayı Göster';
+                    btn.style.backgroundColor = '#0984e3';
+                });
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const allBtn = document.querySelector('.tab-btn.active');
+            filterQuestions('all', allBtn);
+        });
+    </script>
+</body>
+</html>
